@@ -4,7 +4,7 @@ import {client, url} from '@muze-nl/metro/src/metro.mjs'
 import getdatamw from '@muze-nl/metro/src/mw/getdata.mjs'
 import oidc from '@muze-nl/metro-oidc'
 import oldmmw from '@muze-nl/metro-oldm'
-import oldm from '@muze-nl/oldm'
+import oldm from '@muze-nl/oldm' 
 import { _, from } from '@muze-nl/jaqt/src/jaqt.mjs'
 
 export default class SolidAdapter extends HttpAdapter {
