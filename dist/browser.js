@@ -14251,15 +14251,20 @@
       return res;
     };
   }
+  var mimetypes = [
+    /^text\/turtle\b/,
+    /^application\/n-quads\b/,
+    /^text\/x-nquads\b/,
+    /^appliction\/n-triples\b/,
+    /^application\/trig\b/
+  ];
   function isLinkedData(contentType) {
-    const mimetypes = [
-      "text/turtle",
-      "application/n-quads",
-      "text/x-nquads",
-      "appliction/n-triples",
-      "application/trig"
-    ];
-    return mimetypes.includes(contentType);
+    for (const re of mimetypes) {
+      if (re.exec(contentType)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // node_modules/@muze-nl/metro-oldm/src/index.mjs
