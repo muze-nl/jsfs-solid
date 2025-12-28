@@ -9091,8 +9091,9 @@
   // node_modules/@muze-nl/metro/src/everything.mjs
   var metro2 = Object.assign({}, metro_exports, {
     mw: {
-      jsonmw,
-      thrower: throwermw
+      json: jsonmw,
+      thrower: throwermw,
+      gedata
     },
     api,
     jsonApi
@@ -14209,7 +14210,7 @@
     if (!options.prefixes["ldp"]) {
       options.prefixes["ldp"] = "http://www.w3.org/ns/ldp#";
     }
-    const context = src_default2(options);
+    const context = src_default2.context(options);
     return async function oldmmw2(req, next) {
       if (!req.headers.get("Accept")) {
         req = req.with({
