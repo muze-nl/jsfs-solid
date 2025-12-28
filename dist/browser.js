@@ -9093,7 +9093,7 @@
     mw: {
       json: jsonmw,
       thrower: throwermw,
-      gedata
+      getdata: getdatamw
     },
     api,
     jsonApi
@@ -14237,7 +14237,29 @@
         }
       }
       let res = await next(req);
+      if (res && isLinkedData(res.headers?.get("Content-Type"))) {
+        let tempRes = res.clone();
+        let body = await tempRes.text();
+        try {
+          let ld = context.parse(body, req.url, res.headers.get("Content-Type"));
+          return res.with({
+            body: ld
+          });
+        } catch (e) {
+        }
+      }
+      return res;
     };
+  }
+  function isLinkedData(contentType) {
+    const mimetypes = [
+      "text/turtle",
+      "application/n-quads",
+      "text/x-nquads",
+      "appliction/n-triples",
+      "application/trig"
+    ];
+    return mimetypes.includes(contentType);
   }
 
   // node_modules/@muze-nl/metro-oldm/src/index.mjs
