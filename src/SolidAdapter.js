@@ -60,7 +60,7 @@ export default class SolidAdapter extends HttpAdapter
             if (!result.data.primary?.ldp$contains) {
                 throw new Error(path+' could not find ldp container', {cause: result})
             }
-            from(result.data.primary.ldp$contains)
+            return from(result.data.primary.ldp$contains)
             .where({
                 a: 'ldp$Resource'
             })
