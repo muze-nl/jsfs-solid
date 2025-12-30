@@ -14726,7 +14726,10 @@
     async list(path) {
       let result2 = await this.read(path);
       if (result2.data) {
-        from(result2.data).where({
+        if (!result2.data.primary?.ldp$contains) {
+          throw new Error(path + " could not find ldp container", { cause: result2 });
+        }
+        from(result2.data.primary.ldp$contains).where({
           a: "ldp$Resource"
         }).select({
           filename: (o) => jsfs.path.filename(metro.url(o.id).pathname),

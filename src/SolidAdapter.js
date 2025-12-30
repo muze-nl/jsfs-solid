@@ -57,7 +57,10 @@ export default class SolidAdapter extends HttpAdapter
     {
         let result = await this.read(path)
         if (result.data) {
-            from(result.data)
+            if (!result.data.primary?.ldp$contains) {
+                throw new Error(path+' could not find ldp container', {cause: result})
+            }
+            from(result.data.primary.ldp$contains)
             .where({
                 a: 'ldp$Resource'
             })
