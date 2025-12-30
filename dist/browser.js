@@ -14686,20 +14686,15 @@
 
   // src/SolidAdapter.js
   var SolidAdapter = class extends HttpAdapter {
-    #client;
-    #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
+      metroClient = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
+      path = new Path(path);
       super(metroClient, path);
-      this.#client = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
-      this.#path = new Path(path);
     }
     get name() {
       return "SolidAdapter";
     }
     async list(path) {
-      let supportedContentTypes = [
-        "text/turtle"
-      ];
       let result2 = await this.read(path);
       if (result2.data) {
         from(result2.data).where({

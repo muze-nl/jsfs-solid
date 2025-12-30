@@ -7,28 +7,26 @@ import oldmmw from '@muze-nl/metro-oldm'
 import oldm from '@muze-nl/oldm' 
 import { _, from } from '@muze-nl/jaqt/src/jaqt.mjs'
 
-export default class SolidAdapter extends HttpAdapter {
-    
-    #client;
-    #path;
+export default class SolidAdapter extends HttpAdapter
+{
 
-    constructor(metroClient, path='/', solidConfiguration={}) {
-        super(metroClient, path)
-        this.#client = client(metroClient)
+    constructor(metroClient, path='/', solidConfiguration={})
+    {
+        metroClient = client(metroClient)
             .with( oidc.oidcmw(solidConfiguration))
             .with( oldmmw(solidConfiguration))
-        this.#path = new Path(path);
+        path = new Path(path);
+        super(metroClient, path)
     }
 
-    get name() {
+    get name()
+    {
         return 'SolidAdapter';
     }
 
 
-    async list(path) {
-        let supportedContentTypes = [
-            'text/turtle'
-        ];
+    async list(path)
+    {
         let result = await this.read(path)
         if (result.data) {
             from(result.data)
