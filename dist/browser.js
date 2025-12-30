@@ -14709,6 +14709,7 @@
     #client;
     #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
+      super(metroClient, path);
       this.#client = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
       this.#path = new Path(path);
     }
