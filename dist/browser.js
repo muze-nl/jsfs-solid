@@ -8081,7 +8081,7 @@
     }
   });
 
-  // node_modules/@muze-nl/jsfs/src/Path.js
+  // node_modules/@muze-nl/jsfs/src/Path.mjs
   var Path = class _Path {
     #value;
     constructor(path) {
@@ -8206,173 +8206,6 @@
     }
   };
 
-  // node_modules/@muze-nl/jsfs/src/Adapters/HttpAdapter.js
-  var HttpAdapter = class _HttpAdapter {
-    #baseUrl;
-    #path;
-    #exceptionHandler;
-    #fetchParams;
-    constructor(baseUrl, path = "/", exceptionHandler = null, fetchParams = {}) {
-      this.#baseUrl = new URL(baseUrl, window.location.href);
-      this.#path = new Path(path);
-      this.#exceptionHandler = exceptionHandler;
-      this.#fetchParams = fetchParams;
-    }
-    get name() {
-      return "HttpAdapter";
-    }
-    get path() {
-      return this.#path;
-    }
-    supportsWrite() {
-      return true;
-    }
-    supportsStreamingWrite() {
-      return supportsRequestStreams;
-    }
-    supportsStreamingRead() {
-      return true;
-    }
-    cd(path) {
-      if (!Path.isPath(path)) {
-        throw new TypeError(path + " is not a valid path");
-      }
-      return new _HttpAdapter(this.#baseUrl.href, path);
-    }
-    //FIXME: return a jsfs result object instead of http response
-    async write(path, contents, metadata = null) {
-      let params2 = Object.assign({}, this.#fetchParams, {
-        method: "PUT",
-        body: contents
-      });
-      return this.#fetch(path, params2);
-    }
-    writeStream(path, writer, metadata = null) {
-      throw new Error("Not yet implemented");
-    }
-    async read(path) {
-      let params2 = Object.assign({}, this.#fetchParams, {
-        method: "GET"
-      });
-      let response2 = await this.#fetch(path, params2);
-      let result2 = {
-        type: this.#getMimetype(response2),
-        name: Path.filename(path),
-        http: {
-          headers: response2.headers,
-          status: response2.status,
-          url: response2.url
-        }
-      };
-      if (result2.type.match(/text\/.*/)) {
-        result2.contents = await response2.text();
-      } else if (result2.type.match(/application\/json.*/)) {
-        result2.contents = await response2.json();
-      } else {
-        result2.contents = await response2.blob();
-      }
-      return result2;
-    }
-    readStream(path, reader) {
-      throw new Error("Not yet implemented");
-    }
-    async exists(path) {
-      let params2 = Object.assign({}, this.#fetchParams, {
-        method: "HEAD"
-      });
-      return this.#fetch(path, params2);
-    }
-    async delete(path) {
-      let params2 = Object.assign({}, this.#fetchParams, {
-        method: "DELETE"
-      });
-      return this.#fetch(path, params2);
-    }
-    async list(path) {
-      let supportedContentTypes = [
-        "text/html",
-        "text/xhtml",
-        "text/xhtml+xml",
-        "text/xml"
-      ];
-      let result2 = await this.read(path);
-      if (supportedContentTypes.includes(result2.type.split(";")[0])) {
-        var html = result2.contents;
-      } else {
-        let url3 = this.#getUrl(path);
-        throw new TypeError("URL " + url3 + " is not of a supported content type", {
-          cause: result2
-        });
-      }
-      let basePath = Path.collapse(this.#baseUrl.pathname);
-      let parentUrl = this.#getUrl(path);
-      let dom = document.createElement("template");
-      dom.innerHTML = html;
-      let links = dom.content.querySelectorAll("a[href]");
-      return Array.from(links).map((link) => {
-        let url3 = new URL(link.getAttribute("href"), parentUrl.href);
-        link.href = url3.href;
-        return {
-          filename: Path.filename(link.pathname),
-          path: link.pathname,
-          name: link.innerText,
-          href: link.href
-        };
-      }).filter((link) => {
-        let testURL = new URL(link.href);
-        testURL.pathname = Path.parent(testURL.pathname);
-        return testURL.href === parentUrl.href;
-      }).map((link) => {
-        return {
-          filename: link.filename,
-          path: link.path.substring(basePath.length - 1),
-          //TODO: Path.collapse() now always adds a trailing '/', so this works, but the added trailing / is probably not correct
-          name: link.name
-        };
-      });
-    }
-    #getUrl(path) {
-      path = Path.collapse(this.#baseUrl.pathname + Path.collapse(path));
-      return new URL(path, this.#baseUrl);
-    }
-    async #fetch(path, options) {
-      return fetch(this.#getUrl(path), options).catch((e) => {
-        if (!this.#exceptionHandler || !this.#exceptionHandler(url, options, e)) {
-          throw e;
-        }
-      });
-    }
-    #getMimetype(response2) {
-      if (response2.headers.has("Content-Type")) {
-        return response2.headers.get("Content-Type");
-      } else {
-        return null;
-      }
-    }
-  };
-  var supportsRequestStreams = (async () => {
-    const supportsStreamsInRequestObjects = !new Request(
-      "",
-      {
-        body: new ReadableStream(),
-        method: "POST",
-        duplex: "half"
-        // required in chrome
-      }
-    ).headers.has("Content-Type");
-    if (!supportsStreamsInRequestObjects) {
-      return false;
-    }
-    return fetch(
-      "data:a/a;charset=utf-8,",
-      {
-        method: "POST",
-        body: new ReadableStream(),
-        duplex: "half"
-      }
-    ).then(() => true, () => false);
-  })();
-
   // node_modules/@muze-nl/metro/src/metro.mjs
   var metro_exports = {};
   __export(metro_exports, {
@@ -8384,7 +8217,7 @@
     request: () => request,
     response: () => response,
     trace: () => trace,
-    url: () => url2
+    url: () => url
   });
   var metroURL = "https://metro.muze.nl/details/";
   if (!Symbol.metroProxy) {
@@ -8395,7 +8228,7 @@
   }
   var Client = class _Client {
     clientOptions = {
-      url: typeof window != "undefined" ? url2(window.location) : url2("https://localhost"),
+      url: typeof window != "undefined" ? url(window.location) : url("https://localhost"),
       verbs: ["get", "post", "put", "delete", "patch", "head", "options", "query"]
     };
     static tracers = {};
@@ -8412,7 +8245,7 @@
     constructor(...options) {
       for (let option of options) {
         if (typeof option == "string" || option instanceof String) {
-          this.clientOptions.url = url2(this.clientOptions.url.href, option);
+          this.clientOptions.url = url(this.clientOptions.url.href, option);
         } else if (option instanceof Function) {
           this.#addMiddlewares([option]);
         } else if (option && typeof option == "object") {
@@ -8420,7 +8253,7 @@
             if (param == "middlewares") {
               this.#addMiddlewares(option[param]);
             } else if (param == "url") {
-              this.clientOptions.url = url2(this.clientOptions.url.href, option[param]);
+              this.clientOptions.url = url(this.clientOptions.url.href, option[param]);
             } else if (typeof option[param] == "function") {
               this.clientOptions[param] = option[param](this.clientOptions[param], this.clientOptions);
             } else {
@@ -8544,7 +8377,7 @@
         params2[prop] = value(params2[prop], params2);
       } else {
         if (prop == "url") {
-          params2.url = url2(params2.url, value);
+          params2.url = url(params2.url, value);
         } else if (prop == "headers") {
           params2.headers = new Headers(current.headers);
           if (!(value instanceof Headers)) {
@@ -8565,13 +8398,13 @@
   }
   function request(...options) {
     let requestParams = {
-      url: typeof window != "undefined" ? url2(window.location) : url2("https://localhost/"),
+      url: typeof window != "undefined" ? url(window.location) : url("https://localhost/"),
       duplex: "half"
       // required when setting body to ReadableStream, just set it here by default already
     };
     for (let option of options) {
       if (typeof option == "string" || option instanceof URL || option instanceof URLSearchParams) {
-        requestParams.url = url2(requestParams.url, option);
+        requestParams.url = url(requestParams.url, option);
       } else if (option && (option instanceof FormData || option instanceof ReadableStream || option instanceof Blob || option instanceof ArrayBuffer || option instanceof DataView)) {
         requestParams.body = option;
       } else if (option && typeof option == "object") {
@@ -8709,17 +8542,17 @@
       }
     });
   }
-  function appendSearchParams(url3, params2) {
+  function appendSearchParams(url2, params2) {
     if (typeof params2 == "function") {
-      params2(url3.searchParams, url3);
+      params2(url2.searchParams, url2);
     } else {
       params2 = new URLSearchParams(params2);
       params2.forEach((value, key) => {
-        url3.searchParams.append(key, value);
+        url2.searchParams.append(key, value);
       });
     }
   }
-  function url2(...options) {
+  function url(...options) {
     let validParams = [
       "hash",
       "host",
@@ -8787,7 +8620,7 @@
             break;
           case "with":
             result2 = function(...options2) {
-              return url2(target, ...options2);
+              return url(target, ...options2);
             };
             break;
           case "filename":
@@ -8965,6 +8798,153 @@
     }
     return object;
   }
+
+  // node_modules/@muze-nl/jsfs/src/Adapters/Http.mjs
+  var HttpAdapter = class {
+    #client;
+    #path;
+    constructor(metroClient, path = "/") {
+      this.#client = client(metroClient);
+      this.#path = new Path(path);
+    }
+    get name() {
+      return "HttpAdapter";
+    }
+    get path() {
+      return this.#path;
+    }
+    supportsWrite() {
+      return true;
+    }
+    supportsStreamingWrite() {
+      return supportsRequestStreams;
+    }
+    supportsStreamingRead() {
+      return true;
+    }
+    cd(path) {
+      if (!Path.isPath(path)) {
+        throw new TypeError(path + " is not a valid path");
+      }
+      if (Path.isRelative(path)) {
+        path = Path.collapse(path, this.#path);
+      }
+      return new this.constructor(this.#client, path);
+    }
+    //FIXME: return a jsfs result object instead of http response
+    async write(path, contents, metadata = null) {
+      return this.#client.put({ body: contents });
+    }
+    writeStream(path, writer, metadata = null) {
+      throw new Error("Not yet implemented");
+    }
+    async read(path) {
+      let response2 = await this.#client.get(path);
+      let result2 = {
+        type: this.#getMimetype(response2),
+        name: Path.filename(path),
+        http: {
+          headers: response2.headers,
+          status: response2.status,
+          url: response2.url
+        }
+      };
+      if (result2.type.match(/text\/.*/)) {
+        result2.contents = await response2.text();
+      } else if (result2.type.match(/application\/json.*/)) {
+        result2.contents = await response2.json();
+      } else {
+        result2.contents = await response2.blob();
+      }
+      return result2;
+    }
+    readStream(path, reader) {
+      throw new Error("Not yet implemented");
+    }
+    async exists(path) {
+      return this.#client.head(path);
+    }
+    async delete(path) {
+      return this.#client.delete(path);
+    }
+    async list(path) {
+      let supportedContentTypes = [
+        "text/html",
+        "text/xhtml",
+        "text/xhtml+xml",
+        "text/xml"
+      ];
+      let result2 = await this.read(path);
+      if (supportedContentTypes.includes(result2.type.split(";")[0])) {
+        var html = result2.contents;
+      } else {
+        let url2 = this.#getUrl(path);
+        throw new TypeError("URL " + url2 + " is not of a supported content type", {
+          cause: result2
+        });
+      }
+      let basePath = url(this.#client.clientOptions.url).pathname;
+      let parentUrl = this.#getUrl(path);
+      let dom = document.createElement("template");
+      dom.innerHTML = html;
+      let links = dom.content.querySelectorAll("a[href]");
+      return Array.from(links).map((link) => {
+        let url2 = new URL(link.getAttribute("href"), parentUrl.href);
+        link.href = url2.href;
+        return {
+          filename: Path.filename(link.pathname),
+          path: link.pathname,
+          name: link.innerText,
+          href: link.href
+        };
+      }).filter((link) => {
+        let testURL = new URL(link.href);
+        testURL.pathname = Path.parent(testURL.pathname);
+        return testURL.href === parentUrl.href;
+      }).map((link) => {
+        return {
+          filename: link.filename,
+          path: link.path.substring(basePath.length - 1),
+          //TODO: Path.collapse() now always adds a trailing '/', so this works, but the added trailing / is probably not correct
+          name: link.name
+        };
+      });
+    }
+    #getUrl(path) {
+      let basePath = url(this.#client.clientOptions.url).pathname;
+      path = Path.collapse(basePath + Path.collapse(path));
+      return new URL(path, this.#client.clientOptions.url);
+    }
+    #getMimetype(response2) {
+      if (response2.headers.has("Content-Type")) {
+        return response2.headers.get("Content-Type");
+      } else {
+        return null;
+      }
+    }
+  };
+  var supportsRequestStreams = (async () => {
+    const supportsStreamsInRequestObjects = !new Request(
+      "",
+      {
+        body: new ReadableStream(),
+        method: "POST",
+        duplex: "half"
+        // required in chrome
+      }
+    ).headers.has("Content-Type");
+    if (!supportsStreamsInRequestObjects) {
+      return false;
+    }
+    return fetch(
+      "data:a/a;charset=utf-8,",
+      {
+        method: "POST",
+        body: new ReadableStream(),
+        duplex: "half"
+      }
+    ).then(() => true, () => false);
+  })();
 
   // node_modules/@muze-nl/metro/src/mw/getdata.mjs
   function getdatamw() {
@@ -9184,9 +9164,9 @@
       if (data instanceof URL) {
         data = data.href;
       }
-      let url3 = new URL(data);
-      if (url3.href != data) {
-        if (!(url3.href + "/" == data || url3.href == data + "/")) {
+      let url2 = new URL(data);
+      if (url2.href != data) {
+        if (!(url2.href + "/" == data || url2.href == data + "/")) {
           return error("data is not a valid url", data, "validURL", path);
         }
       }
@@ -9364,9 +9344,9 @@
         grant_type: "authorization_code",
         code_verifier: generateCodeVerifier(64)
       },
-      authorize_callback: async (url3) => {
-        if (window.location.href != url3.href) {
-          window.location.replace(url3.href);
+      authorize_callback: async (url2) => {
+        if (window.location.href != url2.href) {
+          window.location.replace(url2.href);
         }
         return false;
       }
@@ -9467,17 +9447,17 @@
     }
     function getTokensFromLocation() {
       if (typeof window !== "undefined" && window?.location) {
-        let url3 = url2(window.location);
+        let url2 = url(window.location);
         let code, state, params2;
-        if (url3.searchParams.has("code")) {
-          params2 = url3.searchParams;
-          url3 = url3.with({ search: "" });
-          history.pushState({}, "", url3.href);
-        } else if (url3.hash) {
-          let query = url3.hash.substr(1);
+        if (url2.searchParams.has("code")) {
+          params2 = url2.searchParams;
+          url2 = url2.with({ search: "" });
+          history.pushState({}, "", url2.href);
+        } else if (url2.hash) {
+          let query = url2.hash.substr(1);
           params2 = new URLSearchParams("?" + query);
-          url3 = url3.with({ hash: "" });
-          history.pushState({}, "", url3.href);
+          url2 = url2.with({ hash: "" });
+          history.pushState({}, "", url2.href);
         }
         if (params2) {
           code = params2.get("code");
@@ -9554,7 +9534,7 @@
       if (!oauth2.authorization_endpoint) {
         throw metroError("oauth2mw: Missing options.oauth2_configuration.authorization_endpoint");
       }
-      let url3 = url2(oauth2.authorization_endpoint, { hash: "" });
+      let url2 = url(oauth2.authorization_endpoint, { hash: "" });
       assert(oauth2, {
         client_id: /.+/,
         redirect_uri: /.+/,
@@ -9589,7 +9569,7 @@
       if (oauth2.prompt) {
         search.prompt = oauth2.prompt;
       }
-      return url2(url3, { search });
+      return url(url2, { search });
     }
     function getAccessTokenRequest(grant_type = null) {
       assert(oauth2, {
@@ -9599,7 +9579,7 @@
       if (!oauth2.token_endpoint) {
         throw metroError("oauth2mw: Missing options.endpoints.token url");
       }
-      let url3 = url2(oauth2.token_endpoint, { hash: "" });
+      let url2 = url(oauth2.token_endpoint, { hash: "" });
       let params2 = {
         grant_type: grant_type || oauth2.grant_type,
         client_id: oauth2.client_id
@@ -9629,7 +9609,7 @@
           throw new Error("Unknown grant_type: ".oauth2.grant_type);
           break;
       }
-      return request(url3, { method: "POST", body: new URLSearchParams(params2) });
+      return request(url2, { method: "POST", body: new URLSearchParams(params2) });
     }
   }
   function isExpired(token) {
@@ -9677,10 +9657,10 @@
     return randomState;
   }
   function isRedirected() {
-    let url3 = new URL(document.location.href);
-    if (!url3.searchParams.has("code")) {
-      if (url3.hash) {
-        let query = url3.hash.substr(1);
+    let url2 = new URL(document.location.href);
+    if (!url2.searchParams.has("code")) {
+      if (url2.hash) {
+        let query = url2.hash.substr(1);
         params = new URLSearchParams("?" + query);
         if (params.has("code")) {
           return true;
@@ -9959,7 +9939,7 @@
         keyInfo = { domain: options.site, keyPair };
         await keys.set(keyInfo);
       }
-      const url3 = everything_default.url(req.url);
+      const url2 = everything_default.url(req.url);
       if (req.url.startsWith(options.authorization_endpoint)) {
         let params2 = req.body;
         if (params2 instanceof URLSearchParams || params2 instanceof FormData) {
@@ -9975,7 +9955,7 @@
           }
         });
       } else if (req.headers.has("Authorization")) {
-        const nonce = localStorage.getItem(url3.host + ":nonce") || void 0;
+        const nonce = localStorage.getItem(url2.host + ":nonce") || void 0;
         const accessToken = req.headers.get("Authorization").split(" ")[1];
         const dpopHeader = await DPoP(keyInfo.keyPair, req.url, req.method, nonce, accessToken);
         req = req.with({
@@ -9987,7 +9967,7 @@
       }
       let response2 = await next(req);
       if (response2.headers.get("DPoP-Nonce")) {
-        localStorage.setItem(url3.host + ":nonce", response2.headers.get("DPoP-Nonce"));
+        localStorage.setItem(url2.host + ":nonce", response2.headers.get("DPoP-Nonce"));
       }
       return response2;
     };
@@ -10037,7 +10017,7 @@
     };
     options = Object.assign({}, defaultOptions, options);
     const TestSucceeded = false;
-    function MustUseHTTPS(url3) {
+    function MustUseHTTPS(url2) {
       return TestSucceeded;
     }
     const openid_provider_metadata = {
@@ -10180,9 +10160,9 @@
       client: client(),
       force_authorization: false,
       use_dpop: true,
-      authorize_callback: async (url3) => {
-        if (window.location.href != url3.href) {
-          window.location.replace(url3.href);
+      authorize_callback: async (url2) => {
+        if (window.location.href != url2.href) {
+          window.location.replace(url2.href);
         }
         return false;
       }
@@ -10342,15 +10322,15 @@
       this.sources = /* @__PURE__ */ Object.create(null);
       this.separator = options?.separator ?? "$";
     }
-    parse(input, url3, type) {
-      const { quads, prefixes: prefixes3 } = this.parser(input, url3, type);
+    parse(input, url2, type) {
+      const { quads, prefixes: prefixes3 } = this.parser(input, url2, type);
       if (prefixes3) {
         for (let prefix2 in prefixes3) {
           let prefixURL = prefixes3[prefix2];
           if (prefixURL.match(/^http(s?):\/\/$/i)) {
-            prefixURL += url3.substring(prefixURL.length);
+            prefixURL += url2.substring(prefixURL.length);
           } else try {
-            prefixURL = new URL(prefixes3[prefix2], url3).href;
+            prefixURL = new URL(prefixes3[prefix2], url2).href;
           } catch (err) {
             console.error("Could not parse prefix", prefixes3[prefix2], err.message);
           }
@@ -10359,8 +10339,8 @@
           }
         }
       }
-      this.sources[url3] = new Graph(quads, url3, type, prefixes3, this);
-      return this.sources[url3];
+      this.sources[url2] = new Graph(quads, url2, type, prefixes3, this);
+      return this.sources[url2];
     }
     setType(literal2, shortType) {
       if (!shortType) {
@@ -10386,9 +10366,9 @@
   };
   var Graph = class {
     #blankNodes = /* @__PURE__ */ Object.create(null);
-    constructor(quads, url3, mimetype, prefixes3, context) {
+    constructor(quads, url2, mimetype, prefixes3, context) {
       this.mimetype = mimetype;
-      this.url = url3;
+      this.url = url2;
       this.prefixes = prefixes3;
       this.context = context;
       this.subjects = /* @__PURE__ */ Object.create(null);
@@ -10420,8 +10400,8 @@
         }
         subject.addPredicate(quad2.predicate.id, quad2.object);
       }
-      if (this.subjects[url3]) {
-        this.primary = this.subjects[url3];
+      if (this.subjects[url2]) {
+        this.primary = this.subjects[url2];
       } else {
         this.primary = null;
       }
@@ -14035,8 +14015,8 @@
       format: type
     });
     let prefixes3 = /* @__PURE__ */ Object.create(null);
-    const quads = parser.parse(input, null, (prefix2, url3) => {
-      prefixes3[prefix2] = url3.id;
+    const quads = parser.parse(input, null, (prefix2, url2) => {
+      prefixes3[prefix2] = url2.id;
     });
     return { quads, prefixes: prefixes3 };
   };

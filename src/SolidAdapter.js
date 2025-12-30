@@ -1,5 +1,5 @@
-import Path from '@muze-nl/jsfs/src/Path.js';
-import HttpAdapter from '@muze-nl/jsfs/src/Adapters/HttpAdapter.js'
+import Path from '@muze-nl/jsfs/src/Path.mjs';
+import HttpAdapter from '@muze-nl/jsfs/src/Adapters/Http.mjs'
 import {client, url} from '@muze-nl/metro/src/metro.mjs'
 import getdatamw from '@muze-nl/metro/src/mw/getdata.mjs'
 import oidc from '@muze-nl/metro-oidc'
