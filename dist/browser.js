@@ -14691,9 +14691,11 @@
     #client;
     #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
-      this.#client = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
-      this.#path = new Path(path);
-      super(this.#client, this.#path);
+      metroClient = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
+      path = new Path(path);
+      super(metroClient, path);
+      this.#client = metroClient;
+      this.#path = path;
     }
     get name() {
       return "SolidAdapter";

@@ -14,11 +14,13 @@ export default class SolidAdapter extends HttpAdapter
 
     constructor(metroClient, path='/', solidConfiguration={})
     {
-        this.#client = client(metroClient)
+        metroClient = client(metroClient)
             .with( oidc.oidcmw(solidConfiguration))
             .with( oldmmw(solidConfiguration))
-        this.#path = new Path(path);
-        super(this.#client, this.#path)
+        path = new Path(path);
+        super(metroClient, path)
+        this.#client = metroClient
+        this.#path = path
     }
 
     get name()
