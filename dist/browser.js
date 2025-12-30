@@ -8246,6 +8246,8 @@
       for (let option of options) {
         if (typeof option == "string" || option instanceof String) {
           this.clientOptions.url = url(this.clientOptions.url.href, option);
+        } else if (option instanceof _Client) {
+          Object.assign(this.clientOptions, option.clientOptions);
         } else if (option instanceof Function) {
           this.#addMiddlewares([option]);
         } else if (option && typeof option == "object") {
@@ -8841,7 +8843,7 @@
     async read(path) {
       let response2 = await this.#client.get(path);
       let result2 = {
-        type: this.#getMimetype(response2),
+        type: this.getMimetype(response2),
         name: Path.filename(path),
         http: {
           headers: response2.headers,
@@ -8878,13 +8880,13 @@
       if (supportedContentTypes.includes(result2.type.split(";")[0])) {
         var html = result2.contents;
       } else {
-        let url2 = this.#getUrl(path);
+        let url2 = this.getUrl(path);
         throw new TypeError("URL " + url2 + " is not of a supported content type", {
           cause: result2
         });
       }
       let basePath = url(this.#client.clientOptions.url).pathname;
-      let parentUrl = this.#getUrl(path);
+      let parentUrl = this.getUrl(path);
       let dom = document.createElement("template");
       dom.innerHTML = html;
       let links = dom.content.querySelectorAll("a[href]");
@@ -8910,12 +8912,12 @@
         };
       });
     }
-    #getUrl(path) {
+    getUrl(path) {
       let basePath = url(this.#client.clientOptions.url).pathname;
       path = Path.collapse(basePath + Path.collapse(path));
       return new URL(path, this.#client.clientOptions.url);
     }
-    #getMimetype(response2) {
+    getMimetype(response2) {
       if (response2.headers.has("Content-Type")) {
         return response2.headers.get("Content-Type");
       } else {
@@ -8991,7 +8993,7 @@
         }
       }
       let res = await next(req);
-      if (isJSON(res.headers.get("Content-Type"))) {
+      if (res && isJSON(res.headers?.get("Content-Type"))) {
         let tempRes = res.clone();
         let body = await tempRes.text();
         try {
@@ -14686,13 +14688,38 @@
 
   // src/SolidAdapter.js
   var SolidAdapter = class extends HttpAdapter {
+    #client;
+    #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
-      metroClient = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
-      path = new Path(path);
-      super(metroClient, path);
+      this.#client = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
+      this.#path = new Path(path);
+      super(this.#client, this.#path);
     }
     get name() {
       return "SolidAdapter";
+    }
+    async read(path) {
+      let response2 = await this.#client.get(path);
+      let result2 = {
+        type: this.getMimetype(response2),
+        name: Path.filename(path),
+        http: {
+          headers: response2.headers,
+          status: response2.status,
+          url: response2.url
+        }
+      };
+      if (response2.data) {
+        result2.data = response2.data;
+      }
+      if (result2.type.match(/text\/.*/)) {
+        result2.contents = await response2.text();
+      } else if (result2.type.match(/application\/json.*/)) {
+        result2.contents = await response2.json();
+      } else {
+        result2.contents = await response2.blob();
+      }
+      return result2;
     }
     async list(path) {
       let result2 = await this.read(path);
