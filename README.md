@@ -97,6 +97,7 @@ Just make sure that the data is OLDM data.
 ## Dependencies
 - [JSFS](https://github.com/muze-nl/jsfs)
 - [OLDM](https://github.com/muze-nl/oldm)
+- [JAQT](https://github.com/muze-nl/jaqt)
 - [MetroJS](https://github.com/muze-nl/metro)
 - [Metro-OIDC](https://github.com/muze-nl/metro-oidc)
 - [Metro-Oauth2](https://github.com/muze-nl/metro-oauth2)
