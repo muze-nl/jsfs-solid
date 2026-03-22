@@ -8206,6 +8206,74 @@
     }
   };
 
+  // node_modules/@muze-nl/jsfs/src/FileSystem.mjs
+  var FileSystem = class _FileSystem {
+    #adapter;
+    #path = "/";
+    constructor(adapter) {
+      this.#adapter = adapter;
+      this.#path = this.#adapter.path;
+    }
+    get path() {
+      return this.#path;
+    }
+    cd(path) {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return new _FileSystem(this.#adapter.cd(path));
+    }
+    async read(path, reader = null) {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      if (typeof reader === "function") {
+        if (!this.#adapter.supportsStreamingRead()) {
+          throw new Error("Adapter " + this.#adapter.name + " does not support streaming reading.");
+        }
+        return this.#adapter.readStream(path, reader);
+      } else {
+        return this.#adapter.read(path);
+      }
+    }
+    async write(path, contents, metadata = null) {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      if (!this.#adapter.supportsWrite()) {
+        throw new Error("Adapter " + this.#adapter.name + " is read only.");
+      }
+      if (typeof contents === "function") {
+        if (!this.#adapter.supportsStreamingWrite()) {
+          throw new Error("Adapter " + this.#adapter.name + " does not support streaming writing.");
+        }
+        return this.#adapter.writeStream(path, contents, metadata);
+      } else if (typeof contents === "string") {
+        return this.#adapter.write(path, contents, metadata);
+      } else {
+        throw new TypeError("Cannot write contents of type " + typeof contents);
+      }
+    }
+    async delete(path) {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return this.#adapter.delete(path);
+    }
+    async exists(path) {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return this.#adapter.exists(path);
+    }
+    async list(path = "") {
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return this.#adapter.list(path);
+    }
+  };
+
   // node_modules/@muze-nl/metro/src/metro.mjs
   var metro_exports = {};
   __export(metro_exports, {
@@ -8948,16 +9016,15 @@
     ).then(() => true, () => false);
   })();
 
-  // node_modules/@muze-nl/metro/src/mw/getdata.mjs
-  function getdatamw() {
-    return async function getdata(req, next) {
-      let res = await next(req);
-      if (res.ok && res.data) {
-        return res.data;
-      }
-      return res;
-    };
-  }
+  // node_modules/@muze-nl/jsfs/src/index.mjs
+  var jsfs2 = {
+    fs: FileSystem,
+    adapters: {
+      https: HttpAdapter
+    },
+    path: Path
+  };
+  globalThis.jsfs = jsfs2;
 
   // node_modules/@muze-nl/metro/src/mw/json.mjs
   function jsonmw(options) {
@@ -9027,6 +9094,17 @@
             cause: res
           });
         }
+      }
+      return res;
+    };
+  }
+
+  // node_modules/@muze-nl/metro/src/mw/getdata.mjs
+  function getdatamw() {
+    return async function getdata(req, next) {
+      let res = await next(req);
+      if (res.ok && res.data) {
+        return res.data;
       }
       return res;
     };
@@ -14169,90 +14247,6 @@
   globalThis.oldm = oldm2;
   var src_default2 = oldm2;
 
-  // node_modules/@muze-nl/metro-oldm/src/oldmmw.mjs
-  function oldmmw(options) {
-    options = Object.assign({
-      contentType: "text/turtle",
-      prefixes: {
-        "ldp": "http://www.w3.org/ns/ldp#",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "dct": "http://purl.org/dc/terms/",
-        "stat": "http://www.w3.org/ns/posix/stat#",
-        "turtle": "http://www.w3.org/ns/iana/media-types/text/turtle#",
-        "schem": "https://schema.org/",
-        "solid": "http://www.w3.org/ns/solid/terms#",
-        "acl": "http://www.w3.org/ns/auth/acl#",
-        "pims": "http://www.w3.org/ns/pim/space#",
-        "vcard": "http://www.w3.org/2006/vcard/ns#",
-        "foaf": "http://xmlns.com/foaf/0.1/"
-      },
-      parser: src_default2.n3Parser,
-      writer: src_default2.n3Writer
-    }, options);
-    if (!options.prefixes["ldp"]) {
-      options.prefixes["ldp"] = "http://www.w3.org/ns/ldp#";
-    }
-    const context = src_default2.context(options);
-    return async function oldmmw2(req, next) {
-      if (!req.headers.get("Accept")) {
-        req = req.with({
-          headers: {
-            "Accept": options.accept ?? options.contentType
-          }
-        });
-      }
-      if (req.method !== "GET" && req.method !== "HEAD") {
-        if (req.data && typeof req.data == "object" && !(req.data instanceof ReadableStream)) {
-          const contentType = req.headers.get("Content-Type");
-          if (!contentType || isPlainText(contentType)) {
-            req = req.with({
-              headers: {
-                "Content-Type": options.contentType
-              }
-            });
-          }
-          if (isLinkedData(req.headers.get("Content-Type"))) {
-            req = req.with({
-              body: await context.writer(req.data)
-            });
-          }
-        }
-      }
-      let res = await next(req);
-      if (res && isLinkedData(res.headers?.get("Content-Type"))) {
-        let tempRes = res.clone();
-        let body = await tempRes.text();
-        try {
-          let ld = context.parse(body, req.url, res.headers.get("Content-Type"));
-          return res.with({
-            body: ld
-          });
-        } catch (e) {
-        }
-      }
-      return res;
-    };
-  }
-  var mimetypes = [
-    /^text\/turtle\b/,
-    /^application\/n-quads\b/,
-    /^text\/x-nquads\b/,
-    /^appliction\/n-triples\b/,
-    /^application\/trig\b/
-  ];
-  function isLinkedData(contentType) {
-    for (const re of mimetypes) {
-      if (re.exec(contentType)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // node_modules/@muze-nl/metro-oldm/src/index.mjs
-  globalThis.oldmmw = oldmmw;
-  var src_default3 = oldmmw;
-
   // node_modules/@muze-nl/jaqt/src/jaqt.mjs
   function isPrimitiveWrapper(data) {
     return [String, Boolean, Number, BigInt].includes(data?.constructor);
@@ -14686,6 +14680,90 @@
   };
   var _ = new Proxy(getPointerFn(), pointerHandler());
 
+  // node_modules/@muze-nl/metro-oldm/src/oldmmw.mjs
+  function oldmmw(options) {
+    options = Object.assign({
+      contentType: "text/turtle",
+      prefixes: {
+        "ldp": "http://www.w3.org/ns/ldp#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "dct": "http://purl.org/dc/terms/",
+        "stat": "http://www.w3.org/ns/posix/stat#",
+        "turtle": "http://www.w3.org/ns/iana/media-types/text/turtle#",
+        "schem": "https://schema.org/",
+        "solid": "http://www.w3.org/ns/solid/terms#",
+        "acl": "http://www.w3.org/ns/auth/acl#",
+        "pims": "http://www.w3.org/ns/pim/space#",
+        "vcard": "http://www.w3.org/2006/vcard/ns#",
+        "foaf": "http://xmlns.com/foaf/0.1/"
+      },
+      parser: src_default2.n3Parser,
+      writer: src_default2.n3Writer
+    }, options);
+    if (!options.prefixes["ldp"]) {
+      options.prefixes["ldp"] = "http://www.w3.org/ns/ldp#";
+    }
+    const context = src_default2.context(options);
+    return async function oldmmw2(req, next) {
+      if (!req.headers.get("Accept")) {
+        req = req.with({
+          headers: {
+            "Accept": options.accept ?? options.contentType
+          }
+        });
+      }
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        if (req.data && typeof req.data == "object" && !(req.data instanceof ReadableStream)) {
+          const contentType = req.headers.get("Content-Type");
+          if (!contentType || isPlainText(contentType)) {
+            req = req.with({
+              headers: {
+                "Content-Type": options.contentType
+              }
+            });
+          }
+          if (isLinkedData(req.headers.get("Content-Type"))) {
+            req = req.with({
+              body: await context.writer(req.data)
+            });
+          }
+        }
+      }
+      let res = await next(req);
+      if (res && isLinkedData(res.headers?.get("Content-Type"))) {
+        let tempRes = res.clone();
+        let body = await tempRes.text();
+        try {
+          let ld = context.parse(body, req.url, res.headers.get("Content-Type"));
+          return res.with({
+            body: ld
+          });
+        } catch (e) {
+        }
+      }
+      return res;
+    };
+  }
+  var mimetypes = [
+    /^text\/turtle\b/,
+    /^application\/n-quads\b/,
+    /^text\/x-nquads\b/,
+    /^appliction\/n-triples\b/,
+    /^application\/trig\b/
+  ];
+  function isLinkedData(contentType) {
+    for (const re of mimetypes) {
+      if (re.exec(contentType)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // node_modules/@muze-nl/metro-oldm/src/index.mjs
+  globalThis.oldmmw = oldmmw;
+  var src_default3 = oldmmw;
+
   // src/SolidAdapter.js
   var SolidAdapter = class extends HttpAdapter {
     #client;
@@ -14742,8 +14820,12 @@
     }
   };
 
-  // src/browser.js
-  var browser_default2 = SolidAdapter;
+  // src/SolidClient.js
+  function solidClient(...options) {
+    return new jsfs.fs(new SolidAdapter(...options));
+  }
+  var SolidClient_default = SolidAdapter;
+  globalThis.solidClient = solidClient;
   globalThis.SolidAdapter = SolidAdapter;
 })();
 /*! Bundled license information:

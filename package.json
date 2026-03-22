@@ -1,6 +1,6 @@
 {
   "name": "@muze-nl/jsfs-solid",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "author": "auke@muze.nl",
   "source": "src/SolidAdapter.js",
   "main": "dist/browser.js",
@@ -14,8 +14,8 @@
   "description": "A filesystem adapter for JSFS that can read/write Solid Storage PODs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-dev": "esbuild --bundle src/browser.js --outfile=dist/browser.js --sourcemap;",
-    "build": "esbuild --bundle src/browser.js --outfile=dist/browser.min.js --minify --sourcemap;"
+    "build-dev": "esbuild --bundle src/SolidClient.js --outfile=dist/browser.js --sourcemap;",
+    "build": "esbuild --bundle src/SolidClient.js --outfile=dist/browser.min.js --minify --sourcemap;"
   },
   "repository": {
     "type": "git",
