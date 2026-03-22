@@ -14776,7 +14776,7 @@
     #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
       metroClient = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
-      path = new Path(path);
+      path = Path.collapse(path);
       super(metroClient, path);
       this.#client = metroClient;
       this.#path = path;
@@ -14785,7 +14785,7 @@
       return "SolidAdapter";
     }
     async read(path) {
-      let response2 = await this.#client.get(path);
+      let response2 = await this.#client.get(Path.collapse(path, this.#path));
       let result2 = {
         type: this.getMimetype(response2),
         name: Path.filename(path),

@@ -17,7 +17,7 @@ export default class SolidAdapter extends HttpAdapter
         metroClient = client(metroClient)
             .with( oidc.oidcmw(solidConfiguration))
             .with( oldmmw(solidConfiguration))
-        path = new Path(path);
+        path = Path.collapse(path);
         super(metroClient, path)
         this.#client = metroClient
         this.#path = path
@@ -30,7 +30,7 @@ export default class SolidAdapter extends HttpAdapter
 
     async read(path)
     {
-        let response = await this.#client.get(path);
+        let response = await this.#client.get(Path.collapse(path, this.#path));
         let result = {
             type: this.getMimetype(response),
             name: Path.filename(path),
