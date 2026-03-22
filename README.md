@@ -87,7 +87,22 @@ The `list` method returns an array of objects with these properties:
 }
 ```
 
-The `read` method returns a dataset using [OLDM](https://github.com/muze-nl/oldm). Similarly, you can write files like this:
+The `read` method returns these properties, where `data` is a dataset using [OLDM](https://github.com/muze-nl/oldm). 
+```javascript
+{
+	type,
+	name,
+	contents,
+	data,
+	http: {
+		headers,
+		status,
+		url
+	}
+}
+```
+
+Similarly, you can write files like this:
 ```javascript
 await client.write(data, 'movies.ttl', 'text/turtle')
 ```
