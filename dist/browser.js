@@ -8416,9 +8416,9 @@
     return new Client(...deepClone(options));
   }
   function getRequestParams(req, current) {
-    let params2 = current || {};
-    if (!params2.url && current.url) {
-      params2.url = current.url;
+    let params = current || {};
+    if (!params.url && current.url) {
+      params.url = current.url;
     }
     for (let prop of [
       "method",
@@ -8444,27 +8444,27 @@
         value = value[Symbol.metroSource];
       }
       if (typeof value == "function") {
-        params2[prop] = value(params2[prop], params2);
+        params[prop] = value(params[prop], params);
       } else {
         if (prop == "url") {
-          params2.url = url(params2.url, value);
+          params.url = url(params.url, value);
         } else if (prop == "headers") {
-          params2.headers = new Headers(current.headers);
+          params.headers = new Headers(current.headers);
           if (!(value instanceof Headers)) {
             value = new Headers(req.headers);
           }
           for (let [key, val] of value.entries()) {
-            params2.headers.set(key, val);
+            params.headers.set(key, val);
           }
         } else {
-          params2[prop] = value;
+          params[prop] = value;
         }
       }
     }
     if (req instanceof Request && req.data) {
-      params2.body = req.data;
+      params.body = req.data;
     }
-    return params2;
+    return params;
   }
   function request(...options) {
     let requestParams = {
@@ -8528,9 +8528,9 @@
     });
   }
   function getResponseParams(res, current) {
-    let params2 = current || {};
-    if (!params2.url && current.url) {
-      params2.url = current.url;
+    let params = current || {};
+    if (!params.url && current.url) {
+      params.url = current.url;
     }
     for (let prop of ["status", "statusText", "headers", "body", "url", "type", "redirected"]) {
       let value = res[prop];
@@ -8541,19 +8541,19 @@
         value = value[Symbol.metroSource];
       }
       if (typeof value == "function") {
-        params2[prop] = value(params2[prop], params2);
+        params[prop] = value(params[prop], params);
       } else {
         if (prop == "url") {
-          params2.url = new URL(value, params2.url || "https://localhost/");
+          params.url = new URL(value, params.url || "https://localhost/");
         } else {
-          params2[prop] = value;
+          params[prop] = value;
         }
       }
     }
     if (res instanceof Response && res.data) {
-      params2.body = res.data;
+      params.body = res.data;
     }
-    return params2;
+    return params;
   }
   function response(...options) {
     let responseParams = {};
@@ -8612,12 +8612,12 @@
       }
     });
   }
-  function appendSearchParams(url2, params2) {
-    if (typeof params2 == "function") {
-      params2(url2.searchParams, url2);
+  function appendSearchParams(url2, params) {
+    if (typeof params == "function") {
+      params(url2.searchParams, url2);
     } else {
-      params2 = new URLSearchParams(params2);
-      params2.forEach((value, key) => {
+      params = new URLSearchParams(params);
+      params.forEach((value, key) => {
         url2.searchParams.append(key, value);
       });
     }
@@ -8736,31 +8736,31 @@
     });
   }
   function formdata(...options) {
-    var params2 = new FormData();
+    var params = new FormData();
     for (let option of options) {
       if (option instanceof HTMLFormElement) {
         option = new FormData(option);
       }
       if (option instanceof FormData) {
         for (let entry of option.entries()) {
-          params2.append(entry[0], entry[1]);
+          params.append(entry[0], entry[1]);
         }
       } else if (option && typeof option == "object") {
         for (let entry of Object.entries(option)) {
           if (Array.isArray(entry[1])) {
             for (let value of entry[1]) {
-              params2.append(entry[0], value);
+              params.append(entry[0], value);
             }
           } else {
-            params2.append(entry[0], entry[1]);
+            params.append(entry[0], entry[1]);
           }
         }
       } else {
         throw new metroError("metro.formdata: unknown option type " + metroURL + "formdata/unknown-option-value/", option);
       }
     }
-    Object.freeze(params2);
-    return new Proxy(params2, {
+    Object.freeze(params);
+    return new Proxy(params, {
       get(target, prop) {
         let result2;
         switch (prop) {
@@ -9165,6 +9165,12 @@
 
   // node_modules/@muze-nl/assert/src/assert.mjs
   globalThis.assertEnabled = false;
+  function enable() {
+    globalThis.assertEnabled = true;
+  }
+  function disable() {
+    globalThis.assertEnabled = false;
+  }
   function assert(source, test) {
     if (globalThis.assertEnabled) {
       let problems = fails(source, test);
@@ -9378,6 +9384,24 @@
   function warn(message, data, pattern, path) {
     console.warn("\u{1F170}\uFE0F  Assert: " + path, message, pattern, data);
   }
+  globalThis.assert = {
+    warn,
+    error,
+    assert,
+    enable,
+    disable,
+    Required,
+    Recommended,
+    Optional,
+    oneOf,
+    anyOf,
+    allOf,
+    validURL,
+    validEmail,
+    instanceOf,
+    not,
+    fails
+  };
 
   // node_modules/@muze-nl/metro-oauth2/src/tokenstore.mjs
   function tokenStore(site) {
@@ -9528,20 +9552,20 @@
     function getTokensFromLocation() {
       if (typeof window !== "undefined" && window?.location) {
         let url2 = url(window.location);
-        let code, state, params2;
+        let code, state, params;
         if (url2.searchParams.has("code")) {
-          params2 = url2.searchParams;
+          params = url2.searchParams;
           url2 = url2.with({ search: "" });
           history.pushState({}, "", url2.href);
         } else if (url2.hash) {
           let query = url2.hash.substr(1);
-          params2 = new URLSearchParams("?" + query);
+          params = new URLSearchParams("?" + query);
           url2 = url2.with({ hash: "" });
           history.pushState({}, "", url2.href);
         }
-        if (params2) {
-          code = params2.get("code");
-          state = params2.get("state");
+        if (params) {
+          code = params.get("code");
+          state = params.get("state");
           let storedState = options.state.get("metro/state");
           if (!state || state !== storedState) {
             return;
@@ -9569,7 +9593,7 @@
       let response2 = await options.client.post(tokenReq);
       if (!response2.ok) {
         let msg = await response2.text();
-        throw metroError("OAuth2mw: fetch access_token: " + response2.status + ": " + response2.statusText, { cause: tokenReq });
+        throw metroError("OAuth2mw: fetch access_token: " + response2.status + ": " + response2.statusText + " (" + msg + ")", { cause: tokenReq });
       }
       let data = await response2.json();
       options.tokens.set("access_token", {
@@ -9660,36 +9684,35 @@
         throw metroError("oauth2mw: Missing options.endpoints.token url");
       }
       let url2 = url(oauth2.token_endpoint, { hash: "" });
-      let params2 = {
+      let params = {
         grant_type: grant_type || oauth2.grant_type,
         client_id: oauth2.client_id
       };
       if (oauth2.client_secret) {
-        params2.client_secret = oauth2.client_secret;
+        params.client_secret = oauth2.client_secret;
       }
       if (oauth2.scope) {
-        params2.scope = oauth2.scope;
+        params.scope = oauth2.scope;
       }
-      switch (params2.grant_type) {
+      switch (params.grant_type) {
         case "authorization_code":
-          params2.redirect_uri = oauth2.redirect_uri;
-          params2.code = options.tokens.get("authorization_code");
+          params.redirect_uri = oauth2.redirect_uri;
+          params.code = options.tokens.get("authorization_code");
           const code_verifier = options.tokens.get("code_verifier");
           if (code_verifier) {
-            params2.code_verifier = code_verifier;
+            params.code_verifier = code_verifier;
           }
           break;
         case "client_credentials":
           break;
         case "refresh_token":
-          const refreshToken = options.tokens.get("refresh_token");
-          params2.refresh_token = refreshToken.value;
+          params.refresh_token = options.tokens.get("refresh_token");
           break;
         default:
           throw new Error("Unknown grant_type: ".oauth2.grant_type);
           break;
       }
-      return request(url2, { method: "POST", body: new URLSearchParams(params2) });
+      return request(url2, { method: "POST", body: new URLSearchParams(params) });
     }
   }
   function isExpired(token) {
@@ -9741,7 +9764,7 @@
     if (!url2.searchParams.has("code")) {
       if (url2.hash) {
         let query = url2.hash.substr(1);
-        params = new URLSearchParams("?" + query);
+        const params = new URLSearchParams("?" + query);
         if (params.has("code")) {
           return true;
         }
@@ -9842,35 +9865,44 @@
     const signature = b64u(await crypto.subtle.sign(subtleAlgorithm(key), key, buf(input)));
     return `${input}.${signature}`;
   }
-  var CHUNK_SIZE = 32768;
-  function encodeBase64Url(input) {
-    if (input instanceof ArrayBuffer) {
-      input = new Uint8Array(input);
-    }
-    const arr = [];
-    for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
-      arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)));
-    }
-    return btoa(arr.join("")).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  var encodeBase64Url;
+  if (Uint8Array.prototype.toBase64) {
+    encodeBase64Url = (input) => {
+      if (input instanceof ArrayBuffer) {
+        input = new Uint8Array(input);
+      }
+      return input.toBase64({ alphabet: "base64url", omitPadding: true });
+    };
+  } else {
+    const CHUNK_SIZE = 32768;
+    encodeBase64Url = (input) => {
+      if (input instanceof ArrayBuffer) {
+        input = new Uint8Array(input);
+      }
+      const arr = [];
+      for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
+        arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)));
+      }
+      return btoa(arr.join("")).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+    };
   }
   function b64u(input) {
     return encodeBase64Url(input);
   }
-  function randomBytes() {
-    return b64u(crypto.getRandomValues(new Uint8Array(32)));
-  }
   var UnsupportedOperationError = class extends Error {
     constructor(message) {
-      super(message ?? "operation not supported");
+      var _a;
+      super(message !== null && message !== void 0 ? message : "operation not supported");
       this.name = this.constructor.name;
-      Error.captureStackTrace?.(this, this.constructor);
+      (_a = Error.captureStackTrace) === null || _a === void 0 ? void 0 : _a.call(Error, this, this.constructor);
     }
   };
   var OperationProcessingError = class extends Error {
     constructor(message) {
+      var _a;
       super(message);
       this.name = this.constructor.name;
-      Error.captureStackTrace?.(this, this.constructor);
+      (_a = Error.captureStackTrace) === null || _a === void 0 ? void 0 : _a.call(Error, this, this.constructor);
     }
   };
   function psAlg(key) {
@@ -9906,7 +9938,7 @@
       case "ECDSA":
         return esAlg(key);
       case "Ed25519":
-        return "EdDSA";
+        return "Ed25519";
       default:
         throw new UnsupportedOperationError("unsupported CryptoKey algorithm name");
     }
@@ -9923,9 +9955,9 @@
   function epochTime() {
     return Math.floor(Date.now() / 1e3);
   }
-  async function DPoP(keypair, htu, htm, nonce, accessToken, additional) {
-    const privateKey = keypair?.privateKey;
-    const publicKey = keypair?.publicKey;
+  async function generateProof(keypair, htu, htm, nonce, accessToken, additional) {
+    const privateKey = keypair === null || keypair === void 0 ? void 0 : keypair.privateKey;
+    const publicKey = keypair === null || keypair === void 0 ? void 0 : keypair.publicKey;
     if (!isPrivateKey(privateKey)) {
       throw new TypeError('"keypair.privateKey" must be a private CryptoKey');
     }
@@ -9954,21 +9986,21 @@
       alg: determineJWSAlgorithm(privateKey),
       typ: "dpop+jwt",
       jwk: await publicJwk(publicKey)
-    }, {
-      ...additional,
+    }, Object.assign(Object.assign({}, additional), {
       iat: epochTime(),
-      jti: randomBytes(),
+      jti: crypto.randomUUID(),
       htm,
       nonce,
       htu,
       ath: accessToken ? b64u(await crypto.subtle.digest("SHA-256", buf(accessToken))) : void 0
-    }, privateKey);
+    }), privateKey);
   }
   async function publicJwk(key) {
     const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey("jwk", key);
     return { kty, crv, e, n, x, y };
   }
   async function generateKeyPair(alg, options) {
+    var _a;
     let algorithm;
     if (typeof alg !== "string" || alg.length === 0) {
       throw new TypeError('"alg" must be a non-empty string');
@@ -9978,7 +10010,7 @@
         algorithm = {
           name: "RSA-PSS",
           hash: "SHA-256",
-          modulusLength: options?.modulusLength ?? 2048,
+          modulusLength: 2048,
           publicExponent: new Uint8Array([1, 0, 1])
         };
         break;
@@ -9986,20 +10018,20 @@
         algorithm = {
           name: "RSASSA-PKCS1-v1_5",
           hash: "SHA-256",
-          modulusLength: options?.modulusLength ?? 2048,
+          modulusLength: 2048,
           publicExponent: new Uint8Array([1, 0, 1])
         };
         break;
       case "ES256":
         algorithm = { name: "ECDSA", namedCurve: "P-256" };
         break;
-      case "EdDSA":
+      case "Ed25519":
         algorithm = { name: "Ed25519" };
         break;
       default:
         throw new UnsupportedOperationError();
     }
-    return crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ["sign", "verify"]);
+    return crypto.subtle.generateKey(algorithm, (_a = options === null || options === void 0 ? void 0 : options.extractable) !== null && _a !== void 0 ? _a : false, ["sign", "verify"]);
   }
 
   // node_modules/@muze-nl/metro-oauth2/src/oauth2.dpop.mjs
@@ -10021,14 +10053,14 @@
       }
       const url2 = everything_default.url(req.url);
       if (req.url.startsWith(options.authorization_endpoint)) {
-        let params2 = req.body;
-        if (params2 instanceof URLSearchParams || params2 instanceof FormData) {
-          params2.set("dpop_jkt", keyInfo.keyPair.publicKey);
+        let params = req.body;
+        if (params instanceof URLSearchParams || params instanceof FormData) {
+          params.set("dpop_jkt", keyInfo.keyPair.publicKey);
         } else {
-          params2.dpop_jkt = keyInfo.keyPair.publicKey;
+          params.dpop_jkt = keyInfo.keyPair.publicKey;
         }
       } else if (req.url.startsWith(options.token_endpoint)) {
-        const dpopHeader = await DPoP(keyInfo.keyPair, req.url, req.method);
+        const dpopHeader = await generateProof(keyInfo.keyPair, req.url, req.method);
         req = req.with({
           headers: {
             "DPoP": dpopHeader
@@ -10037,7 +10069,7 @@
       } else if (req.headers.has("Authorization")) {
         const nonce = localStorage.getItem(url2.host + ":nonce") || void 0;
         const accessToken = req.headers.get("Authorization").split(" ")[1];
-        const dpopHeader = await DPoP(keyInfo.keyPair, req.url, req.method, nonce, accessToken);
+        const dpopHeader = await generateProof(keyInfo.keyPair, req.url, req.method, nonce, accessToken);
         req = req.with({
           headers: {
             "Authorization": "DPoP " + accessToken,
@@ -10676,7 +10708,9 @@
       nil: `${RDF}nil`,
       first: `${RDF}first`,
       rest: `${RDF}rest`,
-      langString: `${RDF}langString`
+      langString: `${RDF}langString`,
+      dirLangString: `${RDF}dirLangString`,
+      reifies: `${RDF}reifies`
     },
     owl: {
       sameAs: "http://www.w3.org/2002/07/owl#sameAs"
@@ -10729,6 +10763,7 @@
     _unescapedIri: true,
     _simpleQuotedString: true,
     _langcode: true,
+    _dircode: true,
     _blank: true,
     _newline: true,
     _comment: true,
@@ -10742,15 +10777,16 @@
       this._unescapedIri = /^<([^\x00-\x20<>\\"\{\}\|\^\`]*)>[ \t]*/;
       this._simpleQuotedString = /^"([^"\\\r\n]*)"(?=[^"])/;
       this._simpleApostropheString = /^'([^'\\\r\n]*)'(?=[^'])/;
-      this._langcode = /^@([a-z]+(?:-[a-z0-9]+)*)(?=[^a-z0-9\-])/i;
+      this._langcode = /^@([a-z]+(?:-[a-z0-9]+)*)(?=[^a-z0-9])/i;
+      this._dircode = /^--(ltr)|(rtl)/;
       this._prefix = /^((?:[A-Za-z\xc0-\xd6\xd8-\xf6\xf8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])(?:\.?[\-0-9A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])*)?:(?=[#\s<])/;
       this._prefixed = /^((?:[A-Za-z\xc0-\xd6\xd8-\xf6\xf8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])(?:\.?[\-0-9A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])*)?:((?:(?:[0-:A-Z_a-z\xc0-\xd6\xd8-\xf6\xf8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff]|%[0-9a-fA-F]{2}|\\[!#-\/;=?\-@_~])(?:(?:[\.\-0-:A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff]|%[0-9a-fA-F]{2}|\\[!#-\/;=?\-@_~])*(?:[\-0-:A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff]|%[0-9a-fA-F]{2}|\\[!#-\/;=?\-@_~]))?)?)(?:[ \t]+|(?=\.?[,;!\^\s#()\[\]\{\}"'<>]))/;
       this._variable = /^\?(?:(?:[A-Z_a-z\xc0-\xd6\xd8-\xf6\xf8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])(?:[\-0-:A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])*)(?=[.,;!\^\s#()\[\]\{\}"'<>])/;
       this._blank = /^_:((?:[0-9A-Z_a-z\xc0-\xd6\xd8-\xf6\xf8-\u02ff\u0370-\u037d\u037f-\u1fff\u200c\u200d\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])(?:\.?[\-0-9A-Z_a-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u037f-\u1fff\u200c\u200d\u203f\u2040\u2070-\u218f\u2c00-\u2fef\u3001-\ud7ff\uf900-\ufdcf\ufdf0-\ufffd]|[\ud800-\udb7f][\udc00-\udfff])*)(?:[ \t]+|(?=\.?[,;:\s#()\[\]\{\}"'<>]))/;
       this._number = /^[\-+]?(?:(\d+\.\d*|\.?\d+)[eE][\-+]?|\d*(\.)?)\d+(?=\.?[,;:\s#()\[\]\{\}"'<>])/;
       this._boolean = /^(?:true|false)(?=[.,;\s#()\[\]\{\}"'<>])/;
-      this._keyword = /^@[a-z]+(?=[\s#<:])/i;
-      this._sparqlKeyword = /^(?:PREFIX|BASE|GRAPH)(?=[\s#<])/i;
+      this._atKeyword = /^@[a-z]+(?=[\s#<:])/i;
+      this._keyword = /^(?:PREFIX|BASE|VERSION|GRAPH)(?=[\s#<])/i;
       this._shortPredicates = /^a(?=[\s#()\[\]\{\}"'<>])/;
       this._newline = /^[ \t]*(?:#[^\n\r]*)?(?:\r\n|\n|\r)[ \t]*/;
       this._comment = /#([^\n\r]*)/;
@@ -10824,7 +10860,9 @@
               if (value === null || illegalIriChars.test(value))
                 return reportSyntaxError(this);
               type = "IRI";
-            } else if (input.length > 1 && input[1] === "<")
+            } else if (input.length > 2 && input[1] === "<" && input[2] === "(")
+              type = "<<(", matchLength = 3;
+            else if (!this._lineMode && input.length > (inputFinished ? 1 : 2) && input[1] === "<")
               type = "<<", matchLength = 2;
             else if (this._n3Mode && input.length > 1 && input[1] === "=") {
               matchLength = 2;
@@ -10873,9 +10911,9 @@
               type = "var", value = match[0];
             break;
           case "@":
-            if (this._previousMarker === "literal" && (match = this._langcode.exec(input)))
+            if (this._previousMarker === "literal" && (match = this._langcode.exec(input)) && match[1] !== "version")
               type = "langcode", value = match[1];
-            else if (match = this._keyword.exec(input))
+            else if (match = this._atKeyword.exec(input))
               type = match[0];
             break;
           case ".":
@@ -10897,6 +10935,11 @@
           case "9":
           case "+":
           case "-":
+            if (input[1] === "-") {
+              if (this._previousMarker === "langcode" && (match = this._dircode.exec(input)))
+                type = "dircode", matchLength = 2, value = match[1] || match[2], matchLength = value.length + 2;
+              break;
+            }
             if (match = this._number.exec(input) || inputFinished && (match = this._number.exec(`${input} `))) {
               type = "literal", value = match[0];
               prefix2 = typeof match[1] === "string" ? xsd.double : typeof match[2] === "string" ? xsd.decimal : xsd.integer;
@@ -10908,7 +10951,9 @@
           case "P":
           case "G":
           case "g":
-            if (match = this._sparqlKeyword.exec(input))
+          case "V":
+          case "v":
+            if (match = this._keyword.exec(input))
               type = match[0].toUpperCase();
             else
               inconclusive = true;
@@ -10938,13 +10983,21 @@
           case "!":
             if (!this._n3Mode)
               break;
+          case ")":
+            if (!inputFinished && (input.length === 1 || input.length === 2 && input[1] === ">")) {
+              break;
+            }
+            if (input.length > 2 && input[1] === ">" && input[2] === ">") {
+              type = ")>>", matchLength = 3;
+              break;
+            }
           case ",":
           case ";":
           case "[":
           case "]":
           case "(":
-          case ")":
           case "}":
+          case "~":
             if (!this._lineMode) {
               matchLength = 1;
               type = firstChar;
@@ -11171,7 +11224,15 @@
     get language() {
       const id = this.id;
       let atPos = id.lastIndexOf('"') + 1;
-      return atPos < id.length && id[atPos++] === "@" ? id.substr(atPos).toLowerCase() : "";
+      const dirPos = id.lastIndexOf("--");
+      return atPos < id.length && id[atPos++] === "@" ? (dirPos > atPos ? id.substr(0, dirPos) : id).substr(atPos).toLowerCase() : "";
+    }
+    // ### The direction of this literal
+    get direction() {
+      const id = this.id;
+      const endPos = id.lastIndexOf('"');
+      const dirPos = id.lastIndexOf("--");
+      return dirPos > endPos && dirPos + 2 < id.length ? id.substr(dirPos + 2).toLowerCase() : "";
     }
     // ### The datatype IRI of this literal
     get datatype() {
@@ -11182,21 +11243,22 @@
       const id = this.id, dtPos = id.lastIndexOf('"') + 1;
       const char = dtPos < id.length ? id[dtPos] : "";
       return char === "^" ? id.substr(dtPos + 2) : (
-        // If "@" follows, return rdf:langString; xsd:string otherwise
-        char !== "@" ? xsd2.string : rdf.langString
+        // If "@" follows, return rdf:langString or rdf:dirLangString; xsd:string otherwise
+        char !== "@" ? xsd2.string : id.indexOf("--", dtPos) > 0 ? rdf.dirLangString : rdf.langString
       );
     }
     // ### Returns whether this object represents the same term as the other
     equals(other) {
       if (other instanceof _Literal)
         return this.id === other.id;
-      return !!other && !!other.datatype && this.termType === other.termType && this.value === other.value && this.language === other.language && this.datatype.value === other.datatype.value;
+      return !!other && !!other.datatype && this.termType === other.termType && this.value === other.value && this.language === other.language && (this.direction === other.direction || this.direction === "" && !other.direction) && this.datatype.value === other.datatype.value;
     }
     toJSON() {
       return {
         termType: this.termType,
         value: this.value,
         language: this.language,
+        direction: this.direction,
         datatype: { termType: "NamedNode", value: this.datatypeString }
       };
     }
@@ -11257,9 +11319,22 @@
         if (id[id.length - 1] === '"')
           return factory.literal(id.substr(1, id.length - 2));
         const endPos = id.lastIndexOf('"', id.length - 1);
+        let languageOrDatatype;
+        if (id[endPos + 1] === "@") {
+          languageOrDatatype = id.substr(endPos + 2);
+          const dashDashIndex = languageOrDatatype.lastIndexOf("--");
+          if (dashDashIndex > 0 && dashDashIndex < languageOrDatatype.length) {
+            languageOrDatatype = {
+              language: languageOrDatatype.substr(0, dashDashIndex),
+              direction: languageOrDatatype.substr(dashDashIndex + 2)
+            };
+          }
+        } else {
+          languageOrDatatype = factory.namedNode(id.substr(endPos + 3));
+        }
         return factory.literal(
           id.substr(1, endPos - 1),
-          id[endPos + 1] === "@" ? id.substr(endPos + 2) : factory.namedNode(id.substr(endPos + 3))
+          languageOrDatatype
         );
       case "[":
         id = JSON.parse(id);
@@ -11293,7 +11368,7 @@
       case "DefaultGraph":
         return "";
       case "Literal":
-        return `"${term.value}"${term.language ? `@${term.language}` : term.datatype && term.datatype.value !== xsd2.string ? `^^${term.datatype.value}` : ""}`;
+        return `"${term.value}"${term.language ? `@${term.language}${term.direction ? `--${term.direction}` : ""}` : term.datatype && term.datatype.value !== xsd2.string ? `^^${term.datatype.value}` : ""}`;
       case "Quad":
         const res = [
           termToId(term.subject, true),
@@ -11356,6 +11431,9 @@
   function literal(value, languageOrDataType) {
     if (typeof languageOrDataType === "string")
       return new Literal(`"${value}"@${languageOrDataType.toLowerCase()}`);
+    if (languageOrDataType !== void 0 && !("termType" in languageOrDataType)) {
+      return new Literal(`"${value}"@${languageOrDataType.language.toLowerCase()}${languageOrDataType.direction ? `--${languageOrDataType.direction.toLowerCase()}` : ""}`);
+    }
     let datatype = languageOrDataType ? languageOrDataType.value : "";
     if (datatype === "") {
       if (typeof value === "boolean")
@@ -11411,7 +11489,7 @@
 
   // node_modules/n3/src/N3Parser.js
   var blankNodePrefix = 0;
-  var N3Parser = class {
+  var N3Parser = class _N3Parser {
     constructor(options) {
       this._contextStack = [];
       this._graph = null;
@@ -11423,7 +11501,6 @@
         this._readPredicateOrNamedGraph = this._readPredicate;
       this._supportsQuads = !(isTurtle || isTriG || isNTriples || isN3);
       this._isImpliedBy = options.isImpliedBy;
-      this._supportsRDFStar = format === "" || /star|\*$/.test(format);
       if (isLineMode)
         this._resolveRelativeIRI = (iri) => {
           return null;
@@ -11431,6 +11508,8 @@
       this._blankNodePrefix = typeof options.blankNodePrefix !== "string" ? "" : options.blankNodePrefix.replace(/^(?!_:)/, "_:");
       this._lexer = options.lexer || new N3Lexer({ lineMode: isLineMode, n3: isN3, isImpliedBy: this._isImpliedBy });
       this._explicitQuantifiers = !!options.explicitQuantifiers;
+      this._parseUnsupportedVersions = !!options.parseUnsupportedVersions;
+      this._version = options.version;
     }
     // ## Static class methods
     // ### `_resetBlankNodePrefix` restarts blank node prefix identification
@@ -11490,6 +11569,12 @@
         this._quantified = context.quantified;
       }
     }
+    // ### `_readBeforeTopContext` is called once only at the start of parsing.
+    _readBeforeTopContext(token) {
+      if (this._version && !this._isValidVersion(this._version))
+        return this._error(`Detected unsupported version as media type parameter: "${this._version}"`, token);
+      return this._readInTopContext(token);
+    }
     // ### `_readInTopContext` reads a token when in the top context
     _readInTopContext(token) {
       switch (token.type) {
@@ -11509,6 +11594,11 @@
           this._sparqlStyle = true;
         case "@base":
           return this._readBaseIRI;
+        // It could be a version declaration
+        case "VERSION":
+          this._sparqlStyle = true;
+        case "@version":
+          return this._readVersion;
         // It could be a graph
         case "{":
           if (this._supportsNamedGraphs) {
@@ -11574,6 +11664,10 @@
           );
           return this._readBlankNodeHead;
         case "(":
+          const stack = this._contextStack, parent = stack.length && stack[stack.length - 1];
+          if (parent.type === "<<") {
+            return this._error("Unexpected list in reified triple", token);
+          }
           this._saveContext("list", this._graph, this.RDF_NIL, null, null);
           this._subject = null;
           return this._readListItem;
@@ -11613,9 +11707,13 @@
           } else
             this._subject = this._factory.literal(token.value, this._factory.namedNode(token.prefix));
           break;
+        case "<<(":
+          if (!this._n3Mode)
+            return this._error("Disallowed triple term as subject", token);
+          this._saveContext("<<(", this._graph, null, null, null);
+          this._graph = null;
+          return this._readSubject;
         case "<<":
-          if (!this._supportsRDFStar)
-            return this._error("Unexpected RDF-star syntax", token);
           this._saveContext("<<", this._graph, null, null, null);
           this._graph = null;
           return this._readSubject;
@@ -11639,6 +11737,7 @@
         case ".":
         case "]":
         case "}":
+        case "|}":
           if (this._predicate === null)
             return this._error(`Unexpected ${type}`, token);
           this._subject = null;
@@ -11663,6 +11762,7 @@
           if ((this._predicate = this._readEntity(token)) === void 0)
             return;
       }
+      this._validAnnotation = true;
       return this._readObject;
     }
     // ### `_readObject` reads a quad's object
@@ -11685,6 +11785,10 @@
           );
           return this._readBlankNodeHead;
         case "(":
+          const stack = this._contextStack, parent = stack.length && stack[stack.length - 1];
+          if (parent.type === "<<") {
+            return this._error("Unexpected list in reified triple", token);
+          }
           this._saveContext("list", this._graph, this._subject, this._predicate, this.RDF_NIL);
           this._subject = null;
           return this._readListItem;
@@ -11699,9 +11803,11 @@
             this._graph = this._factory.blankNode()
           );
           return this._readSubject;
+        case "<<(":
+          this._saveContext("<<(", this._graph, this._subject, this._predicate, null);
+          this._graph = null;
+          return this._readSubject;
         case "<<":
-          if (!this._supportsRDFStar)
-            return this._error("Unexpected RDF-star syntax", token);
           this._saveContext("<<", this._graph, this._subject, this._predicate, null);
           this._graph = null;
           return this._readSubject;
@@ -11730,6 +11836,10 @@
         this._subject = null;
         return this._readBlankNodeTail(token);
       } else {
+        const stack = this._contextStack, parentParent = stack.length > 1 && stack[stack.length - 2];
+        if (parentParent.type === "<<") {
+          return this._error("Unexpected compound blank node expression in reified triple", token);
+        }
         this._predicate = null;
         return this._readPredicate(token);
       }
@@ -11820,12 +11930,19 @@
             this._graph = this._factory.blankNode()
           );
           return this._readSubject;
+        case "<<":
+          this._saveContext("<<", this._graph, null, null, null);
+          this._graph = null;
+          next = this._readSubject;
+          break;
         default:
           if ((item = this._readEntity(token)) === void 0)
             return;
       }
       if (list === null)
         this._subject = list = this._factory.blankNode();
+      if (token.type === "<<")
+        stack[stack.length - 1].subject = this._subject;
       if (previousList === null) {
         if (parent.predicate === null)
           parent.subject = list;
@@ -11853,43 +11970,73 @@
       return this._completeObjectLiteral(token, true);
     }
     // ### `_completeLiteral` completes a literal with an optional datatype or language
-    _completeLiteral(token) {
+    _completeLiteral(token, component) {
       let literal2 = this._factory.literal(this._literalValue);
+      let readCb;
       switch (token.type) {
         // Create a datatyped literal
         case "type":
         case "typeIRI":
           const datatype = this._readEntity(token);
           if (datatype === void 0) return;
+          if (datatype.value === IRIs_default.rdf.langString || datatype.value === IRIs_default.rdf.dirLangString) {
+            return this._error("Detected illegal (directional) languaged-tagged string with explicit datatype", token);
+          }
           literal2 = this._factory.literal(this._literalValue, datatype);
           token = null;
           break;
         // Create a language-tagged string
         case "langcode":
+          if (token.value.split("-").some((t) => t.length > 8))
+            return this._error("Detected language tag with subtag longer than 8 characters", token);
           literal2 = this._factory.literal(this._literalValue, token.value);
+          this._literalLanguage = token.value;
           token = null;
+          readCb = this._readDirCode.bind(this, component);
           break;
       }
-      return { token, literal: literal2 };
+      return { token, literal: literal2, readCb };
+    }
+    _readDirCode(component, listItem, token) {
+      if (token.type === "dircode") {
+        const term = this._factory.literal(this._literalValue, { language: this._literalLanguage, direction: token.value });
+        if (component === "subject")
+          this._subject = term;
+        else
+          this._object = term;
+        this._literalLanguage = void 0;
+        token = null;
+      }
+      if (component === "subject")
+        return token === null ? this._readPredicateOrNamedGraph : this._readPredicateOrNamedGraph(token);
+      return this._completeObjectLiteralPost(token, listItem);
     }
     // Completes a literal in subject position
     _completeSubjectLiteral(token) {
-      this._subject = this._completeLiteral(token).literal;
+      const completed = this._completeLiteral(token, "subject");
+      this._subject = completed.literal;
+      if (completed.readCb)
+        return completed.readCb.bind(this, false);
       return this._readPredicateOrNamedGraph;
     }
     // Completes a literal in object position
     _completeObjectLiteral(token, listItem) {
-      const completed = this._completeLiteral(token);
+      const completed = this._completeLiteral(token, "object");
       if (!completed)
         return;
       this._object = completed.literal;
+      if (completed.readCb)
+        return completed.readCb.bind(this, listItem);
+      return this._completeObjectLiteralPost(completed.token, listItem);
+    }
+    _completeObjectLiteralPost(token, listItem) {
       if (listItem)
         this._emit(this._subject, this.RDF_FIRST, this._object, this._graph);
-      if (completed.token === null)
+      if (token === null)
         return this._getContextEndReader();
       else {
         this._readCallback = this._getContextEndReader();
-        return this._readCallback(completed.token);
+        return this._readCallback(token);
       }
     }
     // ### `_readFormulaTail` reads the end of a formula
@@ -11903,7 +12050,7 @@
     }
     // ### `_readPunctuation` reads punctuation between quads or quad parts
     _readPunctuation(token) {
-      let next, graph = this._graph;
+      let next, graph = this._graph, startingAnnotation = false;
       const subject = this._subject, inversePredicate = this._inversePredicate;
       switch (token.type) {
         // A closing brace ends a graph
@@ -11916,6 +12063,7 @@
         // A dot just ends the statement, without sharing anything with the next
         case ".":
           this._subject = null;
+          this._tripleTerm = null;
           next = this._contextStack.length ? this._readSubject : this._readInTopContext;
           if (inversePredicate) this._inversePredicate = false;
           break;
@@ -11927,19 +12075,26 @@
         case ",":
           next = this._readObject;
           break;
+        // ~ is allowed in the annotation syntax
+        case "~":
+          next = this._readReifierInAnnotation;
+          startingAnnotation = true;
+          break;
         // {| means that the current triple is annotated with predicate-object pairs.
         case "{|":
-          if (!this._supportsRDFStar)
-            return this._error("Unexpected RDF-star syntax", token);
-          const predicate = this._predicate, object = this._object;
-          this._subject = this._factory.quad(subject, predicate, object, this.DEFAULTGRAPH);
+          this._subject = this._readTripleTerm();
+          this._validAnnotation = false;
+          startingAnnotation = true;
           next = this._readPredicate;
           break;
-        // |} means that the current quoted triple in annotation syntax is finalized.
+        // |} means that the current reified triple in annotation syntax is finalized.
         case "|}":
-          if (this._subject.termType !== "Quad")
-            return this._error("Unexpected asserted triple closing", token);
+          if (!this._annotation)
+            return this._error("Unexpected annotation syntax closing", token);
+          if (!this._validAnnotation)
+            return this._error("Annotation block can not be empty", token);
           this._subject = null;
+          this._annotation = false;
           next = this._readPunctuation;
           break;
         default:
@@ -11949,12 +12104,15 @@
           }
           return this._error(`Expected punctuation to follow "${this._object.id}"`, token);
       }
-      if (subject !== null) {
+      if (subject !== null && (!startingAnnotation || startingAnnotation && !this._annotation)) {
         const predicate = this._predicate, object = this._object;
         if (!inversePredicate)
           this._emit(subject, predicate, object, graph);
         else
           this._emit(object, predicate, subject, graph);
+      }
+      if (startingAnnotation) {
+        this._annotation = true;
       }
       return next;
     }
@@ -12004,6 +12162,21 @@
       if (!iri)
         return this._error("Expected valid IRI to follow base declaration", token);
       this._setBase(iri);
+      return this._readDeclarationPunctuation;
+    }
+    // ### `_isValidVersion` checks if the given version is valid for this parser to handle.
+    _isValidVersion(version) {
+      return this._parseUnsupportedVersions || _N3Parser.SUPPORTED_VERSIONS.includes(version);
+    }
+    // ### `_readVersion` reads version string declaration
+    _readVersion(token) {
+      if (token.type !== "literal")
+        return this._error("Expected literal to follow version declaration", token);
+      if (token.end - token.start !== token.value.length + 2)
+        return this._error("Version declarations must use single quotes", token);
+      this._versionCallback(token.value);
+      if (!this._isValidVersion(token.value))
+        return this._error(`Detected unsupported version: "${token.value}"`, token);
       return this._readDeclarationPunctuation;
     }
     // ### `_readNamedGraphLabel` reads the label of a named graph
@@ -12132,26 +12305,17 @@
       this._emit(subject, predicate, object, this._graph);
       return this._readPath;
     }
-    // ### `_readRDFStarTailOrGraph` reads the graph of a nested RDF-star quad or the end of a nested RDF-star triple
-    _readRDFStarTailOrGraph(token) {
-      if (token.type !== ">>") {
-        if (this._supportsQuads && this._graph === null && (this._graph = this._readEntity(token)) !== void 0)
-          return this._readRDFStarTail;
-        return this._error(`Expected >> to follow "${this._object.id}"`, token);
-      }
-      return this._readRDFStarTail(token);
-    }
-    // ### `_readRDFStarTail` reads the end of a nested RDF-star triple
-    _readRDFStarTail(token) {
-      if (token.type !== ">>")
-        return this._error(`Expected >> but got ${token.type}`, token);
+    // ### `_readTripleTermTail` reads the end of a triple term
+    _readTripleTermTail(token) {
+      if (token.type !== ")>>")
+        return this._error(`Expected )>> but got ${token.type}`, token);
       const quad2 = this._factory.quad(
         this._subject,
         this._predicate,
         this._object,
         this._graph || this.DEFAULTGRAPH
       );
-      this._restoreContext("<<", token);
+      this._restoreContext("<<(", token);
       if (this._subject === null) {
         this._subject = quad2;
         return this._readPredicate;
@@ -12159,6 +12323,63 @@
         this._object = quad2;
         return this._getContextEndReader();
       }
+    }
+    // ### `_readReifiedTripleTailOrReifier` reads a reifier or the end of a nested reified triple
+    _readReifiedTripleTailOrReifier(token) {
+      if (token.type === "~") {
+        return this._readReifier;
+      }
+      return this._readReifiedTripleTail(token);
+    }
+    // ### `_readReifiedTripleTail` reads the end of a nested reified triple
+    _readReifiedTripleTail(token) {
+      if (token.type !== ">>")
+        return this._error(`Expected >> but got ${token.type}`, token);
+      this._tripleTerm = null;
+      const reifier = this._readTripleTerm();
+      this._restoreContext("<<", token);
+      const stack = this._contextStack, parent = stack.length && stack[stack.length - 1];
+      if (parent && parent.type === "list") {
+        this._emit(this._subject, this.RDF_FIRST, reifier, this._graph);
+        return this._getContextEndReader();
+      } else if (this._subject === null) {
+        this._subject = reifier;
+        return this._readPredicateOrReifierTripleEnd;
+      } else {
+        this._object = reifier;
+        return this._getContextEndReader();
+      }
+    }
+    _readPredicateOrReifierTripleEnd(token) {
+      if (token.type === ".") {
+        this._subject = null;
+        return this._readPunctuation(token);
+      }
+      return this._readPredicate(token);
+    }
+    // ### `_readReifier` reads the triple term identifier after a tilde when in a reifying triple.
+    _readReifier(token) {
+      this._reifier = this._readEntity(token);
+      return this._readReifiedTripleTail;
+    }
+    // ### `_readReifier` reads the optional triple term identifier after a tilde when in annotation syntax.
+    _readReifierInAnnotation(token) {
+      if (token.type === "IRI" || token.type === "typeIRI" || token.type === "type" || token.type === "prefixed" || token.type === "blank" || token.type === "var") {
+        this._reifier = this._readEntity(token);
+        return this._readPunctuation;
+      }
+      this._readTripleTerm();
+      this._subject = null;
+      return this._readPunctuation(token);
+    }
+    _readTripleTerm() {
+      const stack = this._contextStack, parent = stack.length && stack[stack.length - 1];
+      const parentGraph = parent ? parent.graph : void 0;
+      const reifier = this._reifier || this._factory.blankNode();
+      this._reifier = null;
+      this._tripleTerm = this._tripleTerm || this._factory.quad(this._subject, this._predicate, this._object);
+      this._emit(reifier, this.RDF_REIFIES, this._tripleTerm, parentGraph || this.DEFAULTGRAPH);
+      return reifier;
     }
     // ### `_getContextEndReader` gets the next reader function at the end of a context
     _getContextEndReader() {
@@ -12172,8 +12393,10 @@
           return this._readListItem;
         case "formula":
           return this._readFormulaTail;
+        case "<<(":
+          return this._readTripleTermTail;
         case "<<":
-          return this._readRDFStarTailOrGraph;
+          return this._readReifiedTripleTailOrReifier;
       }
     }
     // ### `_emit` sends a quad through the callback
@@ -12271,21 +12494,24 @@
     }
     // ## Public methods
     // ### `parse` parses the N3 input and emits each parsed quad through the onQuad callback.
-    parse(input, quadCallback, prefixCallback) {
-      let onQuad, onPrefix, onComment;
-      if (quadCallback && (quadCallback.onQuad || quadCallback.onPrefix || quadCallback.onComment)) {
+    parse(input, quadCallback, prefixCallback, versionCallback) {
+      let onQuad, onPrefix, onComment, onVersion;
+      if (quadCallback && (quadCallback.onQuad || quadCallback.onPrefix || quadCallback.onComment || quadCallback.onVersion)) {
         onQuad = quadCallback.onQuad;
         onPrefix = quadCallback.onPrefix;
         onComment = quadCallback.onComment;
+        onVersion = quadCallback.onVersion;
       } else {
         onQuad = quadCallback;
         onPrefix = prefixCallback;
+        onVersion = versionCallback;
       }
-      this._readCallback = this._readInTopContext;
+      this._readCallback = this._readBeforeTopContext;
       this._sparqlStyle = false;
       this._prefixes = /* @__PURE__ */ Object.create(null);
       this._prefixes._ = this._blankNodePrefix ? this._blankNodePrefix.substr(2) : `b${blankNodePrefix++}_`;
       this._prefixCallback = onPrefix || noop;
+      this._versionCallback = onVersion || noop;
       this._inversePredicate = false;
       this._quantified = /* @__PURE__ */ Object.create(null);
       if (!onQuad) {
@@ -12331,6 +12557,7 @@
     parser.RDF_FIRST = factory.namedNode(IRIs_default.rdf.first);
     parser.RDF_REST = factory.namedNode(IRIs_default.rdf.rest);
     parser.RDF_NIL = factory.namedNode(IRIs_default.rdf.nil);
+    parser.RDF_REIFIES = factory.namedNode(IRIs_default.rdf.reifies);
     parser.N3_FORALL = factory.namedNode(IRIs_default.r.forAll);
     parser.N3_FORSOME = factory.namedNode(IRIs_default.r.forSome);
     parser.ABBREVIATIONS = {
@@ -12341,6 +12568,11 @@
     };
     parser.QUANTIFIERS_GRAPH = factory.namedNode("urn:n3:quantifiers");
   }
+  N3Parser.SUPPORTED_VERSIONS = [
+    "1.2",
+    "1.2-basic",
+    "1.1"
+  ];
   initDataFactory(N3Parser.prototype, N3DataFactory_default);
 
   // node_modules/n3/src/N3Util.js
@@ -12606,8 +12838,9 @@
       let value = literal2.value;
       if (escape.test(value))
         value = value.replace(escapeAll, characterReplacer);
+      const direction = literal2.direction ? `--${literal2.direction}` : "";
       if (literal2.language)
-        return `"${value}"@${literal2.language}`;
+        return `"${value}"@${literal2.language}${direction}`;
       if (this._lineMode) {
         if (literal2.datatype.value === xsd3.string)
           return `"${value}"`;
@@ -12652,7 +12885,7 @@
     }
     // ### `_encodeQuad` encodes an RDF-star quad
     _encodeQuad({ subject, predicate, object, graph }) {
-      return `<<${this._encodeSubject(subject)} ${this._encodePredicate(predicate)} ${this._encodeObject(object)}${isDefaultGraph(graph) ? "" : ` ${this._encodeIriOrBlank(graph)}`}>>`;
+      return `<<(${this._encodeSubject(subject)} ${this._encodePredicate(predicate)} ${this._encodeObject(object)}${isDefaultGraph(graph) ? "" : ` ${this._encodeIriOrBlank(graph)}`})>>`;
     }
     // ### `_blockedWrite` replaces `_write` after the writer has been closed
     _blockedWrite() {
@@ -14091,6 +14324,7 @@
   // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
   var n3Parser = (input, uri, type) => {
     const parser = new src_default.Parser({
+      baseIRI: uri,
       blankNodePrefix: "",
       format: type
     });
@@ -14130,6 +14364,9 @@
         }
         let preds = getPredicates(subject);
         for (let pred of preds) {
+          if (pred.predicate.id == "id" || pred.predicate.id == "a") {
+            continue;
+          }
           if (!Array.isArray(pred.object)) {
             pred.object = [pred.object];
           }
@@ -14162,17 +14399,17 @@
           } else if (isLiteral2(object2)) {
             pred.object = getLiteral(object2);
           } else {
-            console.log("weird object", object2, predicate);
+            console.log("oldm-ns: encountered unknown object", object2, predicate);
           }
           preds.push(pred);
         });
         return preds;
       };
       const getLiteral = (object) => {
-        let type = source.getType(object) || null;
+        let type = source.getType(object) || void 0;
         if (type) {
           if (type == xsd4 + source.context.separator + "string" || type == xsd4 + source.context.separator + "number") {
-            type = null;
+            type = void 0;
           } else {
             type = source.fullURI(type);
           }
@@ -14258,23 +14495,33 @@
     } else for (const [filterKey, filterValue] of Object.entries(filter)) {
       if (filterValue instanceof Function) {
         fns.push((data) => {
-          const result2 = {
-            [filterKey]: filterValue(data, filterKey, "select")
-          };
-          return result2;
+          if (filterKey == "_") {
+            return filterValue(data, filterKey, "select");
+          } else {
+            return {
+              [filterKey]: filterValue(data, filterKey, "select")
+            };
+          }
         });
       } else if (!isPrimitiveWrapper(filterValue)) {
         fns.push((data) => {
-          const result2 = {
-            [filterKey]: from(data[filterKey]).select(filterValue)
-          };
-          return result2;
+          if (filterKey == "_") {
+            return from(data[filterKey]).select(filterValue);
+          } else {
+            return {
+              [filterKey]: from(data[filterKey]).select(filterValue)
+            };
+          }
         });
       } else {
         fns.push(() => {
-          return {
-            [filterKey]: filterValue
-          };
+          if (filterKey == "_") {
+            return filterValue;
+          } else {
+            return {
+              [filterKey]: filterValue
+            };
+          }
         });
       }
     }
@@ -14652,7 +14899,7 @@
           prop = localPath.shift();
         }
         return data;
-      } else if (key) {
+      } else if (key && key !== "_") {
         if (typeof data?.[key] != "undefined") {
           return data[key];
         } else {
