@@ -1,0 +1,73 @@
+---
+name: Example workflow calling Hugo build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: potherca/hugo-build/.github/workflows/hugo-build.yaml@main
+    with:
+      ## Use README.md files as folder index
+      build-readme-as-index: true
+      ## Import Hugo module of the "Relearn" theme
+      config-module-imports: |
+        { "path": "github.com/McShelby/hugo-theme-relearn" }
+      ## Module mount configuration. Can be used to add files in specific places
+      ## For a full list of options see:
+      ## https://gohugo.io/configuration/module/#mounts
+      # config-module-mounts: |
+      #   { "source": "path/to/file/in/repo", "target": "path/in/url" }
+      ## Theme specific configuration. For a full list of options see:
+      ## https://mcshelby.github.io/hugo-theme-relearn/configuration/reference/
+      config-params: |
+        "alwaysopen": false,
+        "collapsibleMenu": true,
+        "disableGeneratorVersion": true,
+        "disableInlineCopyToClipBoard": true,
+        "disableLandingPageButton": true,
+        "themeVariant": [ "auto", "zen-dark", "zen-light" ]
+      ## Configuration for in the root of the Hugo config.
+      ## For a full list of options see: https://gohugo.io/configuration/all/
+      config-root-keys: |
+        "disableHugoGeneratorInject": true,
+        "languageCode": "en-us",
+        "markup": { "goldmark": { "renderer": { "unsafe": true } } },
+        "title": "Lightweight Solid Client"
+      ## Custom CSS
+      css: |
+        /* Avoid Duplicate titles */
+        h1:has(+ h1),
+        /* Remove the "Built with Hugo" link */
+        aside p:has(a[title="love"]) {
+            display: none;
+        }
+      ## Docker image to use for building the Hugo site
+      ## (loaded from GitHub Container Registry, instead of Docker Hub)
+      docker-image: ghcr.io/hugomods/hugo:std-go-git
+      ## Path to build the Hugo site from, defaults to ./
+      # path: ./
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Only deploy when build for the main branch
+    if: github.ref == 'refs/heads/main'
+    name: Deploy to GitHub Pages
+    needs: build
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # To deploy to Pages
+      id-token: write   # To verify the deployment originating source
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
