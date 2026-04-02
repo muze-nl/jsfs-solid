@@ -1,9 +1,9 @@
 {
   "name": "@muze-nl/jsfs-solid",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "auke@muze.nl",
   "source": "src/SolidAdapter.js",
-  "main": "dist/browser.js",
+  "main": "src/SolidClient.js",
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
