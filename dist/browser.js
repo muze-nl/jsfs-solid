@@ -15491,8 +15491,8 @@
     const client2 = metro.client(metro.oidc.oidcmw(options), oldmmw(options));
     Object.assign(client2, {
       profile,
-      issuer: profile.solid$oidcIssuer.id,
-      inbox: profile.ldp$inbox.id,
+      issuer: profile.solid$oidcIssuer?.id,
+      inbox: profile.ldp$inbox?.id,
       id: function() {
         return metro.oidc.idToken(this.issuer);
       },

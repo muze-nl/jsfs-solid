@@ -42,8 +42,8 @@ export default async function solidClient(webid, solidOptions) {
 	const client = metro.client(metro.oidc.oidcmw(options), oldmmw(options))
 	Object.assign(client, {
 		profile,
-		issuer: profile.solid$oidcIssuer.id,
-		inbox: profile.ldp$inbox.id,
+		issuer: profile.solid$oidcIssuer?.id,
+		inbox: profile.ldp$inbox?.id,
 		id: function() {
 			return metro.oidc.idToken(this.issuer)
 		},
