@@ -9127,7 +9127,7 @@
   }
 
   // node_modules/@muze-nl/metro/src/mw/getdata.mjs
-  function getdatamw2() {
+  function getdatamw() {
     return async function getdata(req, next) {
       let res = await next(req);
       if (res.ok && res.data) {
@@ -9141,9 +9141,9 @@
   var API = class extends Client {
     constructor(base, methods, bind = null) {
       if (base instanceof Client) {
-        super(base.clientOptions, throwermw(), getdatamw2());
+        super(base.clientOptions, throwermw(), getdatamw());
       } else {
-        super(base, throwermw(), getdatamw2());
+        super(base, throwermw(), getdatamw());
       }
       if (!bind) {
         bind = this;
@@ -9180,7 +9180,7 @@
     mw: {
       json: jsonmw,
       thrower: throwermw,
-      getdata: getdatamw2
+      getdata: getdatamw
     },
     api,
     jsonApi
@@ -10594,7 +10594,7 @@
   }
 
   // node_modules/@muze-nl/metro-oidc/src/oidcmw.mjs
-  function oidcmw2(options = {}) {
+  function oidcmw(options = {}) {
     const defaultOptions = {
       client: client(),
       force_authorization: false,
@@ -10728,7 +10728,7 @@
 
   // node_modules/@muze-nl/metro-oidc/src/browser.mjs
   var oidc = {
-    oidcmw: oidcmw2,
+    oidcmw,
     discover: oidcDiscovery,
     register,
     isRedirected: isRedirected2,
@@ -15481,14 +15481,14 @@
         options.prefixes[prefix2] = defaults.prefixes[prefix2];
       }
     }
-    const profile = await metro.client().with(oldmmw(options), getdatamw()).get(webid)?.primary;
+    const profile = await metro.client().with(oldmmw(options), metro.mw.getdata()).get(webid)?.primary;
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
     options.issuer = profile.solid$oidcIssuer;
     const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", options)));
     return metro.api(
-      metro.client(oidcmw(options), oldmmw(options)),
+      metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
       {
         profile,
         issuer: profile.solid$oidcIssuer,
