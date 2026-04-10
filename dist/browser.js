@@ -15481,7 +15481,8 @@
         options.prefixes[prefix2] = defaults.prefixes[prefix2];
       }
     }
-    const profile = await metro.client().with(oldmmw(options), metro.mw.getdata()).get(webid)?.primary;
+    const response2 = await metro.client(oldmmw(options), metro.mw.getdata()).get(webid);
+    const profile = response2?.primary;
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
