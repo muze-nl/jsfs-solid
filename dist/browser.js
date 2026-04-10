@@ -15486,7 +15486,7 @@
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
-    options.issuer = profile.solid$oidcIssuer;
+    options.issuer = profile.solid$oidcIssuer.id;
     const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s.id, "/", options)));
     const client2 = metro.client(metro.oidc.oidcmw(options), oldmmw(options));
     Object.assign(client2, {
@@ -15499,7 +15499,7 @@
       logout: async function() {
         throw new Error("not yet implemented");
       },
-      ...storage
+      storage
     });
     client2.id.bind(client2);
     client2.logout.bind(client2);
