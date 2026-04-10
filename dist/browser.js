@@ -10538,11 +10538,11 @@
     let response2 = await options.client.post(options.registration_endpoint, {
       body: options.client_info
     });
-    let info2 = response2.data;
-    if (!info2.client_id || !info2.client_secret) {
+    let info = response2.data;
+    if (!info.client_id || !info.client_secret) {
       throw everything_default.metroError("metro.oidc: Error: dynamic registration of client failed, no client_id or client_secret returned", response2);
     }
-    options.client_info = Object.assign(options.client_info, info2);
+    options.client_info = Object.assign(options.client_info, info);
     return options.client_info;
   }
 
@@ -10984,8 +10984,8 @@
   // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
   var oldm_n3_exports = {};
   __export(oldm_n3_exports, {
-    n3Parser: () => n3Parser2,
-    n3Writer: () => n3Writer2
+    n3Parser: () => n3Parser,
+    n3Writer: () => n3Writer
   });
 
   // node_modules/n3/src/N3Lexer.js
@@ -14622,7 +14622,7 @@
   };
 
   // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
-  var n3Parser2 = (input, uri, type) => {
+  var n3Parser = (input, uri, type) => {
     const parser = new src_default.Parser({
       baseIRI: uri,
       blankNodePrefix: "",
@@ -14634,7 +14634,7 @@
     });
     return { quads, prefixes: prefixes3 };
   };
-  var n3Writer2 = (source) => {
+  var n3Writer = (source) => {
     return new Promise((resolve, reject) => {
       const writer = new src_default.Writer({
         format: source.type,
@@ -15398,23 +15398,23 @@
         "vcard": "http://www.w3.org/2006/vcard/ns#",
         "foaf": "http://xmlns.com/foaf/0.1/"
       },
-      parser: n3Parser,
-      writer: n3Writer
+      parser: oldm.n3Parser,
+      writer: oldm.n3Writer
     };
     const options = Object.assign({}, defaults, solidOptions);
     for (const prefix2 in defaults.prefixes) {
-      if (!info.prefixes[prefix2]) {
-        info.prefixes[prefix2] = defaults.prefixes[prefix2];
+      if (!options.prefixes[prefix2]) {
+        options.prefixes[prefix2] = defaults.prefixes[prefix2];
       }
     }
-    const profile = await metro.client().with(oldmmw(info), getdatamw()).get(webid)?.primary;
+    const profile = await metro.client().with(oldmmw(options), getdatamw()).get(webid)?.primary;
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
-    info.issuer = profile.solid$oidcIssuer;
-    const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", info)));
+    options.issuer = profile.solid$oidcIssuer;
+    const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", options)));
     return metro.api(
-      metro.client(oidcmw(info), oldmmw(info)),
+      metro.client(oidcmw(options), oldmmw(options)),
       {
         profile,
         issuer: profile.solid$oidcIssuer,
@@ -15429,6 +15429,14 @@
       }
     );
   }
+
+  // src/browser.js
+  var browser_default3 = {
+    adapter: SolidAdapter,
+    client: solidClient
+  };
+  globalThis.solidClient = solidClient;
+  globalThis.SolidAdapter = SolidAdapter;
 })();
 /*! Bundled license information:
 
