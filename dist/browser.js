@@ -4634,19 +4634,19 @@
             next();
           }
         };
-        readable._destroy = function(error2, cb) {
+        readable._destroy = function(error3, cb) {
           PromisePrototypeThen(
-            close(error2),
-            () => process.nextTick(cb, error2),
+            close(error3),
+            () => process.nextTick(cb, error3),
             // nextTick is here in case cb throws
-            (e) => process.nextTick(cb, e || error2)
+            (e) => process.nextTick(cb, e || error3)
           );
         };
-        async function close(error2) {
-          const hadError = error2 !== void 0 && error2 !== null;
+        async function close(error3) {
+          const hadError = error3 !== void 0 && error3 !== null;
           const hasThrow = typeof iterator.throw === "function";
           if (hadError && hasThrow) {
-            const { value, done } = await iterator.throw(error2);
+            const { value, done } = await iterator.throw(error3);
             await value;
             if (done) {
               return;
@@ -4855,12 +4855,12 @@
         this.destroy(err);
       };
       Readable2.prototype[SymbolAsyncDispose] = function() {
-        let error2;
+        let error3;
         if (!this.destroyed) {
-          error2 = this.readableEnded ? null : new AbortError();
-          this.destroy(error2);
+          error3 = this.readableEnded ? null : new AbortError();
+          this.destroy(error3);
         }
-        return new Promise2((resolve, reject) => eos(this, (err) => err && err !== error2 ? reject(err) : resolve(null)));
+        return new Promise2((resolve, reject) => eos(this, (err) => err && err !== error3 ? reject(err) : resolve(null)));
       };
       Readable2.prototype.push = function(chunk, encoding) {
         return readableAddChunk(this, chunk, encoding, false);
@@ -5413,14 +5413,14 @@
           }
         }
         stream.on("readable", next);
-        let error2;
+        let error3;
         const cleanup = eos(
           stream,
           {
             writable: false
           },
           (err) => {
-            error2 = err ? aggregateTwoErrors(error2, err) : null;
+            error3 = err ? aggregateTwoErrors(error3, err) : null;
             callback();
             callback = nop;
           }
@@ -5430,19 +5430,19 @@
             const chunk = stream.destroyed ? null : stream.read();
             if (chunk !== null) {
               yield chunk;
-            } else if (error2) {
-              throw error2;
-            } else if (error2 === null) {
+            } else if (error3) {
+              throw error3;
+            } else if (error3 === null) {
               return;
             } else {
               await new Promise2(next);
             }
           }
         } catch (err) {
-          error2 = aggregateTwoErrors(error2, err);
-          throw error2;
+          error3 = aggregateTwoErrors(error3, err);
+          throw error3;
         } finally {
-          if ((error2 || (options === null || options === void 0 ? void 0 : options.destroyOnReturn) !== false) && (error2 === void 0 || stream._readableState.autoDestroy)) {
+          if ((error3 || (options === null || options === void 0 ? void 0 : options.destroyOnReturn) !== false) && (error3 === void 0 || stream._readableState.autoDestroy)) {
             destroyImpl.destroyer(stream, null);
           } else {
             stream.off("readable", next);
@@ -6936,11 +6936,11 @@
         yield* Readable2.prototype[SymbolAsyncIterator].call(val);
       }
       async function pumpToNode(iterable, writable, finish, { end }) {
-        let error2;
+        let error3;
         let onresolve = null;
         const resume = (err) => {
           if (err) {
-            error2 = err;
+            error3 = err;
           }
           if (onresolve) {
             const callback = onresolve;
@@ -6949,12 +6949,12 @@
           }
         };
         const wait = () => new Promise2((resolve, reject) => {
-          if (error2) {
-            reject(error2);
+          if (error3) {
+            reject(error3);
           } else {
             onresolve = () => {
-              if (error2) {
-                reject(error2);
+              if (error3) {
+                reject(error3);
               } else {
                 resolve();
               }
@@ -6984,7 +6984,7 @@
           }
           finish();
         } catch (err) {
-          finish(error2 !== err ? aggregateTwoErrors(error2, err) : err);
+          finish(error3 !== err ? aggregateTwoErrors(error3, err) : err);
         } finally {
           cleanup();
           writable.off("drain", resume);
@@ -7038,7 +7038,7 @@
         if (outerSignal) {
           disposable = addAbortListener(outerSignal, abort);
         }
-        let error2;
+        let error3;
         let value;
         const destroys = [];
         let finishCount = 0;
@@ -7047,23 +7047,23 @@
         }
         function finishImpl(err, final) {
           var _disposable;
-          if (err && (!error2 || error2.code === "ERR_STREAM_PREMATURE_CLOSE")) {
-            error2 = err;
+          if (err && (!error3 || error3.code === "ERR_STREAM_PREMATURE_CLOSE")) {
+            error3 = err;
           }
-          if (!error2 && !final) {
+          if (!error3 && !final) {
             return;
           }
           while (destroys.length) {
-            destroys.shift()(error2);
+            destroys.shift()(error3);
           }
           ;
           (_disposable = disposable) === null || _disposable === void 0 ? void 0 : _disposable[SymbolDispose]();
           ac.abort();
           if (final) {
-            if (!error2) {
+            if (!error3) {
               lastStreamCleanup.forEach((fn) => fn());
             }
-            process.nextTick(callback, error2, value);
+            process.nextTick(callback, error3, value);
           }
         }
         let ret;
@@ -9100,7 +9100,7 @@
   }
 
   // node_modules/@muze-nl/metro/src/mw/getdata.mjs
-  function getdatamw() {
+  function getdatamw2() {
     return async function getdata(req, next) {
       let res = await next(req);
       if (res.ok && res.data) {
@@ -9114,9 +9114,9 @@
   var API = class extends Client {
     constructor(base, methods, bind = null) {
       if (base instanceof Client) {
-        super(base.clientOptions, throwermw(), getdatamw());
+        super(base.clientOptions, throwermw(), getdatamw2());
       } else {
-        super(base, throwermw(), getdatamw());
+        super(base, throwermw(), getdatamw2());
       }
       if (!bind) {
         bind = this;
@@ -9153,7 +9153,7 @@
     mw: {
       json: jsonmw,
       thrower: throwermw,
-      getdata: getdatamw
+      getdata: getdatamw2
     },
     api,
     jsonApi
@@ -9162,6 +9162,20 @@
     globalThis.metro = metro2;
   }
   var everything_default = metro2;
+
+  // node_modules/@muze-nl/metro-oauth2/src/oauth2.mjs
+  var oauth2_exports = {};
+  __export(oauth2_exports, {
+    base64url_encode: () => base64url_encode,
+    createState: () => createState,
+    default: () => oauth2mw,
+    generateCodeChallenge: () => generateCodeChallenge,
+    generateCodeVerifier: () => generateCodeVerifier,
+    getExpires: () => getExpires,
+    isAuthorized: () => isAuthorized,
+    isExpired: () => isExpired,
+    isRedirected: () => isRedirected
+  });
 
   // node_modules/@muze-nl/assert/src/assert.mjs
   globalThis.assertEnabled = false;
@@ -9456,9 +9470,9 @@
       }
     };
     assert(options, {});
-    const oauth2 = Object.assign({}, defaultOptions.oauth2_configuration, options?.oauth2_configuration);
+    const oauth22 = Object.assign({}, defaultOptions.oauth2_configuration, options?.oauth2_configuration);
     options = Object.assign({}, defaultOptions, options);
-    options.oauth2_configuration = oauth2;
+    options.oauth2_configuration = oauth22;
     const store = tokenStore(options.site);
     if (!options.tokens) {
       options.tokens = store.tokens;
@@ -9475,12 +9489,12 @@
         redirect_uri: Required(validURL)
       }
     });
-    for (let option in oauth2) {
+    for (let option in oauth22) {
       switch (option) {
         case "access_token":
         case "authorization_code":
         case "refresh_token":
-          options.tokens.set(option, oauth2[option]);
+          options.tokens.set(option, oauth22[option]);
           break;
       }
     }
@@ -9577,7 +9591,7 @@
       }
     }
     async function fetchAccessToken() {
-      if (oauth2.grant_type === "authorization_code" && !options.tokens.has("authorization_code")) {
+      if (oauth22.grant_type === "authorization_code" && !options.tokens.has("authorization_code")) {
         let authReqURL = await getAuthorizationCodeURL();
         if (!options.authorize_callback || typeof options.authorize_callback !== "function") {
           throw metroError("oauth2mw: oauth2 with grant_type:authorization_code requires a callback function in client options.authorize_callback");
@@ -9635,11 +9649,11 @@
       return data;
     }
     async function getAuthorizationCodeURL() {
-      if (!oauth2.authorization_endpoint) {
+      if (!oauth22.authorization_endpoint) {
         throw metroError("oauth2mw: Missing options.oauth2_configuration.authorization_endpoint");
       }
-      let url2 = url(oauth2.authorization_endpoint, { hash: "" });
-      assert(oauth2, {
+      let url2 = url(oauth22.authorization_endpoint, { hash: "" });
+      assert(oauth22, {
         client_id: /.+/,
         redirect_uri: /.+/,
         scope: /.*/
@@ -9647,56 +9661,56 @@
       let search = {
         response_type: "code",
         // implicit flow uses 'token' here, but is not considered safe, so not supported
-        client_id: oauth2.client_id,
-        redirect_uri: oauth2.redirect_uri,
-        state: oauth2.state || createState(40)
+        client_id: oauth22.client_id,
+        redirect_uri: oauth22.redirect_uri,
+        state: oauth22.state || createState(40)
         // OAuth2.1 RFC says optional, but its a good idea to always add/check it
       };
-      if (oauth2.response_type) {
-        search.response_type = oauth2.response_type;
+      if (oauth22.response_type) {
+        search.response_type = oauth22.response_type;
       }
-      if (oauth2.response_mode) {
-        search.response_mode = oauth2.response_mode;
+      if (oauth22.response_mode) {
+        search.response_mode = oauth22.response_mode;
       }
       options.state.set(search.state);
-      if (oauth2.client_secret) {
-        search.client_secret = oauth2.client_secret;
+      if (oauth22.client_secret) {
+        search.client_secret = oauth22.client_secret;
       }
-      if (oauth2.code_verifier) {
-        options.tokens.set("code_verifier", oauth2.code_verifier);
-        search.code_challenge = await generateCodeChallenge(oauth2.code_verifier);
+      if (oauth22.code_verifier) {
+        options.tokens.set("code_verifier", oauth22.code_verifier);
+        search.code_challenge = await generateCodeChallenge(oauth22.code_verifier);
         search.code_challenge_method = "S256";
       }
-      if (oauth2.scope) {
-        search.scope = oauth2.scope;
+      if (oauth22.scope) {
+        search.scope = oauth22.scope;
       }
-      if (oauth2.prompt) {
-        search.prompt = oauth2.prompt;
+      if (oauth22.prompt) {
+        search.prompt = oauth22.prompt;
       }
       return url(url2, { search });
     }
     function getAccessTokenRequest(grant_type = null) {
-      assert(oauth2, {
+      assert(oauth22, {
         client_id: /.+/,
         redirect_uri: /.+/
       });
-      if (!oauth2.token_endpoint) {
+      if (!oauth22.token_endpoint) {
         throw metroError("oauth2mw: Missing options.endpoints.token url");
       }
-      let url2 = url(oauth2.token_endpoint, { hash: "" });
+      let url2 = url(oauth22.token_endpoint, { hash: "" });
       let params = {
-        grant_type: grant_type || oauth2.grant_type,
-        client_id: oauth2.client_id
+        grant_type: grant_type || oauth22.grant_type,
+        client_id: oauth22.client_id
       };
-      if (oauth2.client_secret) {
-        params.client_secret = oauth2.client_secret;
+      if (oauth22.client_secret) {
+        params.client_secret = oauth22.client_secret;
       }
-      if (oauth2.scope) {
-        params.scope = oauth2.scope;
+      if (oauth22.scope) {
+        params.scope = oauth22.scope;
       }
       switch (params.grant_type) {
         case "authorization_code":
-          params.redirect_uri = oauth2.redirect_uri;
+          params.redirect_uri = oauth22.redirect_uri;
           params.code = options.tokens.get("authorization_code");
           const code_verifier = options.tokens.get("code_verifier");
           if (code_verifier) {
@@ -9772,6 +9786,277 @@
       return false;
     }
     return true;
+  }
+  function isAuthorized(tokens) {
+    if (typeof tokens == "string") {
+      tokens = tokenStore(tokens).tokens;
+    }
+    let accessToken = tokens.get("access_token");
+    if (accessToken && !isExpired(accessToken)) {
+      return true;
+    }
+    let refreshToken = tokens.get("refresh_token");
+    if (refreshToken) {
+      return true;
+    }
+    return false;
+  }
+
+  // node_modules/@muze-nl/metro-oauth2/src/oauth2.mockserver.mjs
+  var oauth2_mockserver_exports = {};
+  __export(oauth2_mockserver_exports, {
+    default: () => oauth2mockserver
+  });
+  var baseResponse = {
+    status: 200,
+    statusText: "OK",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  };
+  var badRequest = (error3) => {
+    return {
+      status: 400,
+      statusText: "Bad Request",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        error: "invalid_request",
+        error_description: error3
+      })
+    };
+  };
+  var error2;
+  var pkce = {};
+  function oauth2mockserver(options = {}) {
+    const defaultOptions = {
+      "PKCE": false,
+      "DPoP": false
+    };
+    options = Object.assign({}, defaultOptions, options);
+    return async (req, next) => {
+      let url2 = everything_default.url(req.url);
+      switch (url2.pathname) {
+        case "/authorize/":
+          if (error2 = fails(url2.searchParams, {
+            response_type: "code",
+            client_id: "mockClientId",
+            state: Optional(/.*/)
+          })) {
+            return everything_default.response(badRequest(error2));
+          }
+          if (url2.searchParams.has("code_challenge")) {
+            if (!url2.searchParams.has("code_challenge_method")) {
+              return everything_default.response(badRequest("missing code_challenge_method"));
+            }
+            pkce.code_challenge = url2.searchParams.get("code_challenge");
+            pkce.code_challenge_method = url2.searchParams.get("code_challenge_method");
+          }
+          return everything_default.response(baseResponse, {
+            body: JSON.stringify({
+              code: "mockAuthorizeToken",
+              state: url2.searchParams.get("state")
+            })
+          });
+          break;
+        case "/token/":
+          if (req.data instanceof URLSearchParams) {
+            let body = {};
+            req.data.forEach((value, key) => body[key] = value);
+            req = req.with({ body });
+          }
+          if (error2 = fails(req, {
+            method: "POST",
+            data: {
+              grant_type: oneOf("refresh_token", "authorization_code")
+            }
+          })) {
+            return everything_default.response(badRequest(error2));
+          }
+          switch (req.data.grant_type) {
+            case "refresh_token":
+              if (error2 = fails(req.data, oneOf({
+                refresh_token: "mockRefreshToken",
+                client_id: "mockClientId",
+                client_secret: "mockClientSecret"
+              }, {
+                refresh_token: "mockRefreshToken",
+                client_id: "mockClientId",
+                code_verifier: /.+/
+              }))) {
+                return everything_default.response(badRequest(error2));
+              }
+              break;
+            case "access_token":
+              if (error2 = fails(req.data, oneOf({
+                client_id: "mockClientId",
+                client_secret: "mockClientSecret"
+              }, {
+                client_id: "mockClientId",
+                code_challenge: /.*/,
+                //FIXME: check that this matches code_verifier
+                code_challenge_method: "S256"
+              }))) {
+                return everything_default.response(badRequest(error2));
+              }
+              break;
+          }
+          return everything_default.response(baseResponse, {
+            body: JSON.stringify({
+              access_token: "mockAccessToken",
+              token_type: "mockExample",
+              expires_in: 3600,
+              refresh_token: "mockRefreshToken",
+              example_parameter: "mockExampleValue"
+            })
+          });
+          break;
+        case "/protected/":
+          let auth = req.headers.get("Authorization");
+          let [type, token] = auth ? auth.split(" ") : [];
+          if (!token || token !== "mockAccessToken") {
+            return everything_default.response({
+              status: 401,
+              statusText: "Forbidden",
+              body: "401 Forbidden"
+            });
+          }
+          return everything_default.response(baseResponse, {
+            body: JSON.stringify({
+              result: "Success"
+            })
+          });
+          break;
+        case "/public/":
+          return everything_default.response(baseResponse, {
+            body: JSON.stringify({
+              result: "Success"
+            })
+          });
+          break;
+        default:
+          return everything_default.response({
+            status: 404,
+            statusText: "not found",
+            body: "404 Not Found " + url2
+          });
+          break;
+      }
+    };
+  }
+
+  // node_modules/@muze-nl/metro-oauth2/src/oauth2.discovery.mjs
+  var oauth2_discovery_exports = {};
+  __export(oauth2_discovery_exports, {
+    default: () => makeClient
+  });
+  var validAlgorithms = [
+    "HS256",
+    "HS384",
+    "HS512",
+    "RS256",
+    "RS384",
+    "RS512",
+    "ES256",
+    "ES384",
+    "ES512"
+  ];
+  var validAuthMethods = [
+    "client_secret_post",
+    "client_secret_base",
+    "client_secret_jwt",
+    "private_key_jwt"
+  ];
+  var oauth_authorization_server_metadata = {
+    issuer: Required(validURL),
+    authorization_endpoint: Required(validURL),
+    token_endpoint: Required(validURL),
+    jwks_uri: Optional(validURL),
+    registration_endpoint: Optional(validURL),
+    scopes_supported: Recommended([]),
+    response_types_supported: Required(anyOf("code", "token")),
+    response_modes_supported: Optional([]),
+    grant_types_supported: Optional([]),
+    token_endpoint_auth_methods_supported: Optional([]),
+    token_endpoint_auth_signing_alg_values_supported: Optional([]),
+    service_documentation: Optional(validURL),
+    ui_locales_supported: Optional([]),
+    op_policy_uri: Optional(validURL),
+    op_tos_uri: Optional(validURL),
+    revocation_endpoint: Optional(validURL),
+    revocation_endpoint_auth_methods_supported: Optional(validAuthMethods),
+    revocation_endpoint_auth_signing_alg_values_supported: Optional(validAlgorithms),
+    introspection_endpoint: Optional(validURL),
+    introspection_endpoint_auth_methods_supported: Optional(validAuthMethods),
+    introspection_endpoint_auth_signing_alg_values_supported: Optional(validAlgorithms),
+    code_challendge_methods_supported: Optional([])
+  };
+  function makeClient(options = {}) {
+    const defaultOptions = {
+      client: everything_default.client()
+    };
+    options = Object.assign({}, defaultOptions, options);
+    assert(options, {
+      issuer: Required(validURL)
+    });
+    const oauth_authorization_server_configuration = fetchWellknownOauthAuthorizationServer(options.issuer);
+    return options.client.with(options.issuer);
+  }
+  async function fetchWellknownOauthAuthorizationServer(issuer, client2) {
+    let res = client2.get(everything_default.url(issuer, ".wellknown/oauth_authorization_server"));
+    if (res.ok) {
+      assert(res.headers.get("Content-Type"), /application\/json.*/);
+      let configuration = await res.json();
+      assert(configuration, oauth_authorization_server_metadata);
+      return configuration;
+    }
+    throw everything_default.metroError("metro.oidcmw: Error while fetching " + issuer + ".wellknown/oauth_authorization_server", res);
+  }
+
+  // node_modules/@muze-nl/metro-oauth2/src/oauth2.popup.mjs
+  function handleRedirect(origin = null) {
+    let success = false;
+    origin = origin || window.location.origin;
+    let params = new URLSearchParams(window.location.search);
+    if (!params.has("code") && window.location.hash) {
+      let query = window.location.hash.substr(1);
+      params = new URLSearchParams("?" + query);
+    }
+    let parent = window.parent !== window ? window.parent : window.opener;
+    if (!parent) {
+      console.error("No parent window found, cannot post authorization code (or error)");
+    } else {
+      if (params.has("code")) {
+        parent.postMessage({
+          authorization_code: params.get("code")
+        }, origin);
+        success = true;
+      } else if (params.has("error")) {
+        parent.postMessage({
+          error: params.get("error")
+        }, origin);
+      } else {
+        parent.postMessage({
+          error: "Could not find an authorization_code"
+        }, origin);
+      }
+    }
+    return success;
+  }
+  function authorizePopup(authorizationCodeURL) {
+    return new Promise((resolve, reject) => {
+      addEventListener("message", (event) => {
+        if (event.data.authorization_code) {
+          resolve(event.data.authorization_code);
+        } else if (event.data.error) {
+          reject(event.data.error);
+        } else {
+          reject("Unknown authorization error");
+        }
+      }, { once: true });
+      window.open(authorizationCodeURL);
+    });
   }
 
   // node_modules/@muze-nl/metro-oauth2/src/keysstore.mjs
@@ -10085,6 +10370,21 @@
     };
   }
 
+  // node_modules/@muze-nl/metro-oauth2/src/browser.mjs
+  var oauth2 = Object.assign({}, oauth2_exports, {
+    oauth2mw,
+    mockserver: oauth2_mockserver_exports,
+    discover: oauth2_discovery_exports,
+    tokenstore: tokenStore,
+    dpopmw,
+    keysstore: keysStore,
+    authorizePopup,
+    popupHandleRedirect: handleRedirect
+  });
+  if (!globalThis.metro.oauth2) {
+    globalThis.metro.oauth2 = oauth2;
+  }
+
   // node_modules/@muze-nl/metro-oidc/src/oidc.util.mjs
   var MustHave = (...options) => (value, root) => {
     if (options.filter((o) => root.hasOwnKey(o)).length > 0) {
@@ -10110,7 +10410,7 @@
     "ES384",
     "ES512"
   ];
-  var validAuthMethods = [
+  var validAuthMethods2 = [
     "client_secret_post",
     "client_secret_basic",
     "client_secret_jwt",
@@ -10156,7 +10456,7 @@
       // not testing for 'none'
       request_object_encryption_alg_values_supported: Optional([]),
       request_object_encryption_enc_values_supported: Optional([]),
-      token_endpoint_auth_methods_supported: Optional(anyOf(...validAuthMethods)),
+      token_endpoint_auth_methods_supported: Optional(anyOf(...validAuthMethods2)),
       token_endpoint_auth_signing_alg_values_supported: Optional(MustInclude("RS256"), not(MustInclude("none"))),
       display_values_supported: Optional(anyOf("page", "popup", "touch", "wap")),
       claim_types_supported: Optional(anyOf("normal", "aggregated", "distributed")),
@@ -10209,7 +10509,7 @@
       request_object_signing_alg: Optional(oneOf(...validJWA)),
       request_object_encryption_alg: Optional(oneOf(...validJWA)),
       request_object_encryption_enc: Optional(oneOf(...validJWA)),
-      token_endpoint_auth_method: Optional(oneOf(...validAuthMethods)),
+      token_endpoint_auth_method: Optional(oneOf(...validAuthMethods2)),
       token_endpoint_auth_signing_alg: Optional(oneOf(...validJWA)),
       default_max_age: Optional(Number),
       require_auth_time: Optional(Boolean),
@@ -10238,11 +10538,11 @@
     let response2 = await options.client.post(options.registration_endpoint, {
       body: options.client_info
     });
-    let info = response2.data;
-    if (!info.client_id || !info.client_secret) {
+    let info2 = response2.data;
+    if (!info2.client_id || !info2.client_secret) {
       throw everything_default.metroError("metro.oidc: Error: dynamic registration of client failed, no client_id or client_secret returned", response2);
     }
-    options.client_info = Object.assign(options.client_info, info);
+    options.client_info = Object.assign(options.client_info, info2);
     return options.client_info;
   }
 
@@ -10267,7 +10567,7 @@
   }
 
   // node_modules/@muze-nl/metro-oidc/src/oidcmw.mjs
-  function oidcmw(options = {}) {
+  function oidcmw2(options = {}) {
     const defaultOptions = {
       client: client(),
       force_authorization: false,
@@ -10401,7 +10701,7 @@
 
   // node_modules/@muze-nl/metro-oidc/src/browser.mjs
   var oidc = {
-    oidcmw,
+    oidcmw: oidcmw2,
     discover: oidcDiscovery,
     register,
     isRedirected: isRedirected2,
@@ -10410,10 +10710,10 @@
   if (!globalThis.metro.oidc) {
     globalThis.metro.oidc = oidc;
   }
-  var browser_default = oidc;
+  var browser_default2 = oidc;
 
   // node_modules/@muze-nl/oldm/src/oldm.mjs
-  function oldm(options) {
+  function oldm2(options) {
     return new Context(options);
   }
   var rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -10684,8 +10984,8 @@
   // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
   var oldm_n3_exports = {};
   __export(oldm_n3_exports, {
-    n3Parser: () => n3Parser,
-    n3Writer: () => n3Writer
+    n3Parser: () => n3Parser2,
+    n3Writer: () => n3Writer2
   });
 
   // node_modules/n3/src/N3Lexer.js
@@ -11127,9 +11427,9 @@
           queueMicrotask(() => this._tokenizeToEnd(callback, true));
         else {
           const tokens = [];
-          let error2;
-          this._tokenizeToEnd((e, t) => e ? error2 = e : tokens.push(t), true);
-          if (error2) throw error2;
+          let error3;
+          this._tokenizeToEnd((e, t) => e ? error3 = e : tokens.push(t), true);
+          if (error3) throw error3;
           return tokens;
         }
       } else {
@@ -12516,27 +12816,27 @@
       this._quantified = /* @__PURE__ */ Object.create(null);
       if (!onQuad) {
         const quads = [];
-        let error2;
+        let error3;
         this._callback = (e, t) => {
-          e ? error2 = e : t && quads.push(t);
+          e ? error3 = e : t && quads.push(t);
         };
         this._lexer.tokenize(input).every((token) => {
           return this._readCallback = this._readCallback(token);
         });
-        if (error2) throw error2;
+        if (error3) throw error3;
         return quads;
       }
-      let processNextToken = (error2, token) => {
-        if (error2 !== null)
-          this._callback(error2), this._callback = noop;
+      let processNextToken = (error3, token) => {
+        if (error3 !== null)
+          this._callback(error3), this._callback = noop;
         else if (this._readCallback)
           this._readCallback = this._readCallback(token);
       };
       if (onComment) {
         this._lexer.comments = true;
-        processNextToken = (error2, token) => {
-          if (error2 !== null)
-            this._callback(error2), this._callback = noop;
+        processNextToken = (error3, token) => {
+          if (error3 !== null)
+            this._callback(error3), this._callback = noop;
           else if (this._readCallback) {
             if (token.type === "comment")
               onComment(token.value);
@@ -12792,8 +13092,8 @@
     ${this._encodePredicate(this._predicate = predicate)} ${this._encodeObject(object)}`, done);
         } else
           this._write(`${(this._subject === null ? "" : ".\n") + this._encodeSubject(this._subject = subject)} ${this._encodePredicate(this._predicate = predicate)} ${this._encodeObject(object)}`, done);
-      } catch (error2) {
-        done && done(error2);
+      } catch (error3) {
+        done && done(error3);
       }
     }
     // ### `_writeQuadLine` writes the quad to the output stream as a single line
@@ -12988,13 +13288,13 @@
         this._subject = null;
       }
       this._write = this._blockedWrite;
-      let singleDone = done && ((error2, result2) => {
-        singleDone = null, done(error2, result2);
+      let singleDone = done && ((error3, result2) => {
+        singleDone = null, done(error3, result2);
       });
       if (this._endStream) {
         try {
           return this._outputStream.end(singleDone);
-        } catch (error2) {
+        } catch (error3) {
         }
       }
       singleDone && singleDone();
@@ -14207,8 +14507,8 @@
       let onData, onEnd;
       const callbacks = {
         // Handle quads by pushing them down the pipeline
-        onQuad: (error2, quad2) => {
-          error2 && this.emit("error", error2) || quad2 && this.push(quad2);
+        onQuad: (error3, quad2) => {
+          error3 && this.emit("error", error3) || quad2 && this.push(quad2);
         },
         // Emit prefixes through the `prefix` event
         onPrefix: (prefix2, uri) => {
@@ -14248,8 +14548,8 @@
       stream.on("end", () => {
         this.end();
       });
-      stream.on("error", (error2) => {
-        this.emit("error", error2);
+      stream.on("error", (error3) => {
+        this.emit("error", error3);
       });
       return this;
     }
@@ -14285,8 +14585,8 @@
       stream.on("end", () => {
         this.end();
       });
-      stream.on("error", (error2) => {
-        this.emit("error", error2);
+      stream.on("error", (error3) => {
+        this.emit("error", error3);
       });
       stream.on("prefix", (prefix2, iri) => {
         this._writer.addPrefix(prefix2, iri);
@@ -14322,7 +14622,7 @@
   };
 
   // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
-  var n3Parser = (input, uri, type) => {
+  var n3Parser2 = (input, uri, type) => {
     const parser = new src_default.Parser({
       baseIRI: uri,
       blankNodePrefix: "",
@@ -14334,7 +14634,7 @@
     });
     return { quads, prefixes: prefixes3 };
   };
-  var n3Writer = (source) => {
+  var n3Writer2 = (source) => {
     return new Promise((resolve, reject) => {
       const writer = new src_default.Writer({
         format: source.type,
@@ -14466,23 +14766,23 @@
         writeClassNames(id, subject);
         writeProperties(id, subject);
       });
-      writer.end((error2, result2) => {
+      writer.end((error3, result2) => {
         if (result2) {
           resolve(result2);
         } else {
-          reject(error2);
+          reject(error3);
         }
       });
     });
   };
 
   // node_modules/@muze-nl/oldm/src/index.mjs
-  var oldm2 = {
-    context: oldm,
+  var oldm3 = {
+    context: oldm2,
     ...oldm_n3_exports
   };
-  globalThis.oldm = oldm2;
-  var src_default2 = oldm2;
+  globalThis.oldm = oldm3;
+  var src_default2 = oldm3;
 
   // node_modules/@muze-nl/jaqt/src/jaqt.mjs
   function isPrimitiveWrapper(data) {
@@ -14934,7 +15234,7 @@
   var _ = new Proxy(getPointerFn(), pointerHandler());
 
   // node_modules/@muze-nl/metro-oldm/src/oldmmw.mjs
-  function oldmmw(options) {
+  function oldmmw2(options) {
     options = Object.assign({
       contentType: "text/turtle",
       prefixes: {
@@ -14957,7 +15257,7 @@
       options.prefixes["ldp"] = "http://www.w3.org/ns/ldp#";
     }
     const context = src_default2.context(options);
-    return async function oldmmw2(req, next) {
+    return async function oldmmw3(req, next) {
       if (!req.headers.get("Accept")) {
         req = req.with({
           headers: {
@@ -15014,15 +15314,15 @@
   }
 
   // node_modules/@muze-nl/metro-oldm/src/index.mjs
-  globalThis.oldmmw = oldmmw;
-  var src_default3 = oldmmw;
+  globalThis.oldmmw = oldmmw2;
+  var src_default3 = oldmmw2;
 
   // src/SolidAdapter.js
   var SolidAdapter = class extends HttpAdapter {
     #client;
     #path;
     constructor(metroClient, path = "/", solidConfiguration = {}) {
-      metroClient = client(metroClient).with(browser_default.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
+      metroClient = client(metroClient).with(browser_default2.oidcmw(solidConfiguration)).with(src_default3(solidConfiguration));
       path = Path.collapse(path);
       super(metroClient, path);
       this.#client = metroClient;
@@ -15030,6 +15330,9 @@
     }
     get name() {
       return "SolidAdapter";
+    }
+    supportsDirectories() {
+      return true;
     }
     async read(path) {
       let response2 = await this.#client.get(Path.collapse(path, this.#path));
@@ -15071,15 +15374,61 @@
         throw new Error(path + " could not be parsed", { cause: result2 });
       }
     }
+    async mkdir(path) {
+      this.#client.put(Path.collapse(path, this.#path));
+    }
+    async rmdir(path) {
+      this.#client.delete(Path.collapse(path, this.#path));
+    }
   };
 
   // src/SolidClient.js
-  function solidClient(...options) {
-    return new jsfs.fs(new SolidAdapter(...options));
+  async function solidClient(webid, solidOptions) {
+    const defaults = {
+      prefixes: {
+        "ldp": "http://www.w3.org/ns/ldp#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "dct": "http://purl.org/dc/terms/",
+        "stat": "http://www.w3.org/ns/posix/stat#",
+        "turtle": "http://www.w3.org/ns/iana/media-types/text/turtle#",
+        "schema": "https://schema.org/",
+        "solid": "http://www.w3.org/ns/solid/terms#",
+        "acl": "http://www.w3.org/ns/auth/acl#",
+        "space": "http://www.w3.org/ns/pim/space#",
+        "vcard": "http://www.w3.org/2006/vcard/ns#",
+        "foaf": "http://xmlns.com/foaf/0.1/"
+      },
+      parser: n3Parser,
+      writer: n3Writer
+    };
+    const options = Object.assign({}, defaults, solidOptions);
+    for (const prefix2 in defaults.prefixes) {
+      if (!info.prefixes[prefix2]) {
+        info.prefixes[prefix2] = defaults.prefixes[prefix2];
+      }
+    }
+    const profile = await metro.client().with(oldmmw(info), getdatamw()).get(webid)?.primary;
+    if (!profile || !profile.solid$oidcIssuer) {
+      throw new Error("solidClient: " + webid + " did not return valid solid profile");
+    }
+    info.issuer = profile.solid$oidcIssuer;
+    const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", info)));
+    return metro.api(
+      metro.client(oidcmw(info), oldmmw(info)),
+      {
+        profile,
+        issuer: profile.solid$oidcIssuer,
+        inbox: profile.ldp$inbox,
+        id: function() {
+          return metro.oidc.idToken(this.issuer);
+        },
+        logout: async function() {
+          throw new Error("not yet implemented");
+        },
+        ...storage
+      }
+    );
   }
-  var SolidClient_default = SolidAdapter;
-  globalThis.solidClient = solidClient;
-  globalThis.SolidAdapter = SolidAdapter;
 })();
 /*! Bundled license information:
 
