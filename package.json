@@ -1,6 +1,6 @@
 {
   "name": "@muze-nl/jsfs-solid",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "author": "auke@muze.nl",
   "source": "src/SolidAdapter.js",
   "main": "src/SolidClient.js",

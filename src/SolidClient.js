@@ -39,19 +39,20 @@ export default async function solidClient(webid, solidOptions) {
 	const storage = oldm.many(profile.space$storage)
 		.map(s => new jsfs.fs(new SolidAdapter(s, '/', options)))
 
-	return metro.api(
-		metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
-		{
-			profile,
-			issuer: profile.solid$oidcIssuer,
-			inbox: profile.ldp$inbox,
-			id: function() {
-				return metro.oidc.idToken(this.issuer)
-			},
-			logout: async function() {
-				throw new Error('not yet implemented')
-			},
-			...storage
-		}
-	)
+	const client = metro.client(metro.oidc.oidcmw(options), oldmmw(options))
+	Object.assign(client, {
+		profile,
+		issuer: profile.solid$oidcIssuer,
+		inbox: profile.ldp$inbox,
+		id: function() {
+			return metro.oidc.idToken(this.issuer)
+		},
+		logout: async function() {
+			throw new Error('not yet implemented')
+		},
+		...storage
+	})
+	client.id.bind(client)
+	client.logout.bind(client)
+	return client
 }

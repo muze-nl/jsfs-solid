@@ -15488,21 +15488,22 @@
     }
     options.issuer = profile.solid$oidcIssuer;
     const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", options)));
-    return metro.api(
-      metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
-      {
-        profile,
-        issuer: profile.solid$oidcIssuer,
-        inbox: profile.ldp$inbox,
-        id: function() {
-          return metro.oidc.idToken(this.issuer);
-        },
-        logout: async function() {
-          throw new Error("not yet implemented");
-        },
-        ...storage
-      }
-    );
+    const client2 = metro.client(metro.oidc.oidcmw(options), oldmmw(options));
+    Object.assign(client2, {
+      profile,
+      issuer: profile.solid$oidcIssuer,
+      inbox: profile.ldp$inbox,
+      id: function() {
+        return metro.oidc.idToken(this.issuer);
+      },
+      logout: async function() {
+        throw new Error("not yet implemented");
+      },
+      ...storage
+    });
+    client2.id.bind(client2);
+    client2.logout.bind(client2);
+    return client2;
   }
 
   // src/browser.js
