@@ -30,7 +30,7 @@ export default async function solidClient(webid, solidOptions) {
     		options.prefixes[prefix] = defaults.prefixes[prefix]
     	}
     }
-	const profile = await metro.client().with(oldmmw(options), getdatamw()).get(webid)?.primary
+	const profile = await metro.client().with(oldmmw(options), metro.mw.getdata()).get(webid)?.primary
 	if (!profile || !profile.solid$oidcIssuer) { //FIXME: don't assume $ as the separator
 		throw new Error('solidClient: '+webid+' did not return valid solid profile')
 	}
@@ -39,7 +39,7 @@ export default async function solidClient(webid, solidOptions) {
 		.map(s => new jsfs.fs(new SolidAdapter(s, '/', options)))
 
 	return metro.api(
-		metro.client(oidcmw(options), oldmmw(options)),
+		metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
 		{
 			profile,
 			issuer: profile.solid$oidcIssuer,
