@@ -28,6 +28,11 @@ export default class SolidAdapter extends HttpAdapter
         return 'SolidAdapter';
     }
 
+    supportsDirectories()
+    {
+        return true
+    }
+
     async read(path)
     {
         let response = await this.#client.get(Path.collapse(path, this.#path));
@@ -74,4 +79,11 @@ export default class SolidAdapter extends HttpAdapter
         }
     }
 
+    async mkdir(path) {
+        this.#client.put(Path.collapse(path, this.#path))
+    }
+
+    async rmdir(path) {
+        this.#client.delete(Path.collapse(path, this.#path))
+    }
 }
