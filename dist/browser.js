@@ -1785,7 +1785,7 @@
       function numberIsNaN(obj) {
         return obj !== obj;
       }
-      var hexSliceLookupTable = (function() {
+      var hexSliceLookupTable = function() {
         const alphabet = "0123456789abcdef";
         const table = new Array(256);
         for (let i = 0; i < 16; ++i) {
@@ -1795,7 +1795,7 @@
           }
         }
         return table;
-      })();
+      }();
       function defineBigIntMethod(fn) {
         return typeof BigInt === "undefined" ? BufferBigIntNotDefined : fn;
       }
@@ -6465,7 +6465,7 @@
         const ac = new AbortController();
         const signal = ac.signal;
         const value = fn(
-          (async function* () {
+          async function* () {
             while (true) {
               const _promise = promise;
               promise = null;
@@ -6479,7 +6479,7 @@
               ({ promise, resolve } = createDeferredPromise());
               yield chunk;
             }
-          })(),
+          }(),
           {
             signal
           }
@@ -8254,11 +8254,11 @@
         throw new TypeError("Cannot write contents of type " + typeof contents);
       }
     }
-    async delete(path) {
+    async remove(path) {
       if (!(path instanceof Path)) {
         path = new Path(Path.collapse(path, this.#path));
       }
-      return this.#adapter.delete(path);
+      return this.#adapter.remove(path);
     }
     async exists(path) {
       if (!(path instanceof Path)) {
@@ -8271,6 +8271,30 @@
         path = new Path(Path.collapse(path, this.#path));
       }
       return this.#adapter.list(path);
+    }
+    async mkdir(path = "") {
+      if (!this.#adapter.supportsWrite()) {
+        throw new Error("Adapter " + this.#adapter.name + " is read only.");
+      }
+      if (!this.#adapter.supportsDirectories) {
+        throw new Error("Adapter " + this.#adapter.name + " does not support directories.");
+      }
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return this.#adapter.mkdir(path);
+    }
+    async rmdir(path = "") {
+      if (!this.#adapter.supportsWrite()) {
+        throw new Error("Adapter " + this.#adapter.name + " is read only.");
+      }
+      if (!this.#adapter.supportsDirectories) {
+        throw new Error("Adapter " + this.#adapter.name + " does not support directories.");
+      }
+      if (!(path instanceof Path)) {
+        path = new Path(Path.collapse(path, this.#path));
+      }
+      return this.#adapter.rmdir(path);
     }
   };
 
@@ -8384,7 +8408,7 @@
       options = Object.assign({}, this.clientOptions, options);
       let next;
       for (let middleware of middlewares) {
-        next = /* @__PURE__ */ (function(next2, middleware2) {
+        next = /* @__PURE__ */ function(next2, middleware2) {
           return async function(req2) {
             let res;
             let tracers = Object.values(_Client.tracers);
@@ -8401,7 +8425,7 @@
             }
             return res;
           };
-        })(next, middleware);
+        }(next, middleware);
       }
       return next(req);
     }
@@ -8892,6 +8916,9 @@
     supportsStreamingRead() {
       return true;
     }
+    supportsDirectories() {
+      return false;
+    }
     cd(path) {
       if (!Path.isPath(path)) {
         throw new TypeError(path + " is not a valid path");
@@ -8934,7 +8961,7 @@
     async exists(path) {
       return this.#client.head(path);
     }
-    async delete(path) {
+    async remove(path) {
       return this.#client.delete(path);
     }
     async list(path) {
@@ -13910,9 +13937,9 @@
     // and returns the items per list.
     extractLists({ remove = false, ignoreErrors = false } = {}) {
       const lists = {};
-      const onError = ignoreErrors ? (() => true) : ((node, message) => {
+      const onError = ignoreErrors ? () => true : (node, message) => {
         throw new Error(`${node.value} ${message}`);
-      });
+      };
       const tails = this.getQuads(null, IRIs_default.rdf.rest, IRIs_default.rdf.nil, null);
       const toRemove = remove ? [...tails] : [];
       tails.forEach((tailQuad) => {
