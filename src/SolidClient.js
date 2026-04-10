@@ -37,13 +37,13 @@ export default async function solidClient(webid, solidOptions) {
 	}
 	options.issuer = profile.solid$oidcIssuer
 	const storage = oldm.many(profile.space$storage)
-		.map(s => new jsfs.fs(new SolidAdapter(s, '/', options)))
+		.map(s => new jsfs.fs(new SolidAdapter(s.id, '/', options)))
 
 	const client = metro.client(metro.oidc.oidcmw(options), oldmmw(options))
 	Object.assign(client, {
 		profile,
-		issuer: profile.solid$oidcIssuer,
-		inbox: profile.ldp$inbox,
+		issuer: profile.solid$oidcIssuer.id,
+		inbox: profile.ldp$inbox.id,
 		id: function() {
 			return metro.oidc.idToken(this.issuer)
 		},

@@ -15487,12 +15487,12 @@
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
     options.issuer = profile.solid$oidcIssuer;
-    const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s, "/", options)));
+    const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s.id, "/", options)));
     const client2 = metro.client(metro.oidc.oidcmw(options), oldmmw(options));
     Object.assign(client2, {
       profile,
-      issuer: profile.solid$oidcIssuer,
-      inbox: profile.ldp$inbox,
+      issuer: profile.solid$oidcIssuer.id,
+      inbox: profile.ldp$inbox.id,
       id: function() {
         return metro.oidc.idToken(this.issuer);
       },
