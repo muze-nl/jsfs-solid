@@ -21,8 +21,8 @@ export default async function solidClient(webid, solidOptions) {
 	        'vcard':  'http://www.w3.org/2006/vcard/ns#',
 	        'foaf':   'http://xmlns.com/foaf/0.1/'
 	    },
-	    parser: n3Parser,
-	    writer: n3Writer
+	    parser: oldm.n3Parser,
+	    writer: oldm.n3Writer
     }
     const options = Object.assign({}, defaults, solidOptions)
     for (const prefix in defaults.prefixes) {
