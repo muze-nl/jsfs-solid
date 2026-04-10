@@ -25,7 +25,7 @@
     "@muze-nl/jsfs": "^0.3.5",
     "@muze-nl/metro": "^0.6.20",
     "@muze-nl/metro-oidc": "^0.6.0",
-    "@muze-nl/metro-oldm": "^0.3.3",
-    "@muze-nl/oldm": "^0.5.1"
+    "@muze-nl/metro-oldm": "^0.3.4",
+    "@muze-nl/oldm": "^0.5.2"
   }
 }
