@@ -1,6 +1,6 @@
 {
   "name": "@muze-nl/jsfs-solid",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "auke@muze.nl",
   "source": "src/SolidAdapter.js",
   "main": "src/SolidClient.js",
@@ -23,7 +23,7 @@
   "dependencies": {
     "@muze-nl/jaqt": "^0.10.6",
     "@muze-nl/jsfs": "^0.3.5",
-    "@muze-nl/metro": "^0.6.20",
+    "@muze-nl/metro": "^0.6.21",
     "@muze-nl/metro-oidc": "^0.6.0",
     "@muze-nl/metro-oldm": "^0.3.4",
     "@muze-nl/oldm": "^0.5.2"

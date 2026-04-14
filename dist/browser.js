@@ -9139,6 +9139,8 @@
 
   // node_modules/@muze-nl/metro/src/api.mjs
   var API = class extends Client {
+    #methods = null;
+    #base = "";
     constructor(base, methods, bind = null) {
       if (base instanceof Client) {
         super(base.clientOptions, throwermw(), getdatamw());
@@ -9148,15 +9150,20 @@
       if (!bind) {
         bind = this;
       }
+      this.#methods = methods;
+      this.#base = base;
       for (const methodName in methods) {
         if (typeof methods[methodName] == "function") {
           this[methodName] = methods[methodName].bind(bind);
-        } else if (methods[methodName] && typeof methods[methodName] == "object") {
+        } else if (methods[methodName] && typeof methods[methodName] == "object" && (Object.getPrototypeOf(methods[methodName]) === null || Object.getPrototypeOf(methods[methodName]).constructor === Object)) {
           this[methodName] = new this.constructor(base, methods[methodName], bind);
         } else {
           this[methodName] = methods[methodName];
         }
       }
+    }
+    extend(methods) {
+      return new this.constructor(this.#base, Object.assign({}, this.#methods, methods));
     }
   };
   var JsonAPI = class extends API {
@@ -15486,24 +15493,25 @@
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
     }
-    options.issuer = profile.solid$oidcIssuer.id;
+    if (!options.issuer) {
+      options.issuer = oldm.one(profile.solid$oidcIssuer)?.id;
+    }
     const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s.id, "/", options)));
-    const client2 = metro.client(metro.oidc.oidcmw(options), oldmmw(options));
-    Object.assign(client2, {
-      profile,
-      issuer: profile.solid$oidcIssuer?.id,
-      inbox: profile.ldp$inbox?.id,
-      id: function() {
-        return metro.oidc.idToken(this.issuer);
-      },
-      logout: async function() {
-        throw new Error("not yet implemented");
-      },
-      storage
-    });
-    client2.id.bind(client2);
-    client2.logout.bind(client2);
-    return client2;
+    return metro.api(
+      metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
+      {
+        profile,
+        issuer: oldm.one(profile.solid$oidcIssuer)?.id,
+        inbox: oldm.one(profile.ldp$inbox)?.id,
+        id: function() {
+          return metro.oidc.idToken(this.issuer);
+        },
+        logout: async function() {
+          throw new Error("not yet implemented");
+        },
+        storage
+      }
+    );
   }
 
   // src/browser.js
