@@ -35,24 +35,25 @@ export default async function solidClient(webid, solidOptions) {
 	if (!profile || !profile.solid$oidcIssuer) { //FIXME: don't assume $ as the separator
 		throw new Error('solidClient: '+webid+' did not return valid solid profile')
 	}
-	options.issuer = profile.solid$oidcIssuer.id
+	if (!options.issuer) { // in case you access someone elses profile and pods with your own webid/issuer
+		options.issuer = oldm.one(profile.solid$oidcIssuer)?.id
+	}
 	const storage = oldm.many(profile.space$storage)
 		.map(s => new jsfs.fs(new SolidAdapter(s.id, '/', options)))
 
-	const client = metro.client(metro.oidc.oidcmw(options), oldmmw(options))
-	Object.assign(client, {
-		profile,
-		issuer: profile.solid$oidcIssuer?.id,
-		inbox: profile.ldp$inbox?.id,
-		id: function() {
-			return metro.oidc.idToken(this.issuer)
-		},
-		logout: async function() {
-			throw new Error('not yet implemented')
-		},
-		storage
-	})
-	client.id.bind(client)
-	client.logout.bind(client)
-	return client
+	return metro.api(
+		metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
+		{
+			profile,
+			issuer: oldm.one(profile.solid$oidcIssuer)?.id,
+			inbox: oldm.one(profile.ldp$inbox)?.id,
+			id: function() {
+				return metro.oidc.idToken(this.issuer)
+			},
+			logout: async function() {
+				throw new Error('not yet implemented')
+			},
+			storage
+		}
+	)
 }
