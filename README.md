@@ -9,18 +9,16 @@
 ```javascript
 import '@muze-nl/jsfs-solid'
 
-const client = solidClient(
-	"https://auke.solidcommunity.net/",
-    "/public/",
-    {
-        client_info: {
-  		     client_name: 'My Client'
-  	    }
-    }
-)
-
 async function main() {
-    const dir = await client.list()
+	const client = await solidClient(
+		"https://auke.solidcommunity.net/profile/card#me",
+	    {
+	        client_info: {
+	  		     client_name: 'My Client'
+	  	    }
+	    }
+	)
+    const dir = await client.storage[0].list()
     console.log(dir)
 }
 
@@ -59,9 +57,8 @@ import '@muze-nl/jsfs-solid'
 
 Create a new client like this:
 ```javascript
-const client = solidClient(
-	'https://auke.solidcommunity.net/',
-	'/public/',
+const client = await solidClient(
+	'https://auke.solidcommunity.net/profile/card#me', // a solid webid
 	{
 		client_info: {
 			client_name: "My Client"
@@ -70,7 +67,22 @@ const client = solidClient(
 )
 ```
 
-This client implements a simple filesystem API with the following methods:
+This will read the webid profile and return an API that includes:
+- profile: an object containing the profile information, parsed with [OLDM](https://github.com/muze-nl/oldm)
+- storage: an array with all the storage entries from the webid profile, as a filesystem API (using [JSFS](https://github.com/muze-nl/jsfs))
+- id(): returns the id token, but only if the client has been forced to authenticate/authorize to access a resource. 
+- issuer: the first issuer defined in the webid profile, or null
+- inbox: the first inbox defined in the webid profile, or null
+
+In addition, the client is an HTTP client (Using [Metro](https://github.com/muze-nl/metro) with the following methods: 
+- `get`
+- `post`
+- `put`
+- `delete`
+- `patch`
+Each of these will automatically trigger an OIDC (OpenID Connect) Solid authorization step, if the requested resource requires it.
+
+Each storage entry implements a simple filesystem API with the following methods:
 - `cd`
 - `read`
 - `write`
