@@ -8108,7 +8108,7 @@
   var _ = new Proxy(getPointerFn(), pointerHandler());
 
   // node_modules/@muze-nl/metro-oldm/src/oldmmw.mjs
-  function oldmmw2(options) {
+  function oldmmw(options) {
     options = Object.assign({
       contentType: "text/turtle",
       prefixes: {
@@ -8131,7 +8131,7 @@
       options.prefixes["ldp"] = "http://www.w3.org/ns/ldp#";
     }
     const context = src_default.context(options);
-    return async function oldmmw3(req, next) {
+    return async function oldmmw2(req, next) {
       if (!req.headers.get("Accept")) {
         req = req.with({
           headers: {
@@ -8191,7 +8191,7 @@
   }
 
   // node_modules/@muze-nl/metro-oldm/src/index.mjs
-  var src_default2 = oldmmw2;
+  var src_default2 = oldmmw;
 
   // src/SolidAdapter.js
   var SolidAdapter = class extends HttpAdapter {
@@ -8260,7 +8260,7 @@
 
   // src/SolidClient.js
   async function solidClient(webid, options) {
-    const response2 = await metro.client(oldmmw(options), metro.mw.getdata()).get(webid);
+    const response2 = await metro.client(src_default2(options), metro.mw.getdata()).get(webid);
     const profile = response2?.primary;
     if (!profile || !profile.solid$oidcIssuer) {
       throw new Error("solidClient: " + webid + " did not return valid solid profile");
@@ -8270,7 +8270,7 @@
     }
     const storage = oldm.many(profile.space$storage).map((s) => new jsfs.fs(new SolidAdapter(s.id, "/", options)));
     return metro.api(
-      metro.client(metro.oidc.oidcmw(options), oldmmw(options)),
+      metro.client(metro.oidc.oidcmw(options), src_default2(options)),
       {
         profile,
         issuer: oldm.one(profile.solid$oidcIssuer)?.id,

@@ -1,6 +1,7 @@
 import '@muze-nl/jsfs'
 import '@muze-nl/metro'
 import '@muze-nl/metro-oidc'
+import oldmmw from '@muze-nl/metro-oldm'
 import '@muze-nl/oldm'
 import '@muze-nl/jaqt'
 import '@muze-nl/assert'
