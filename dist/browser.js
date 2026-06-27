@@ -1109,24 +1109,24 @@
       Buffer3.prototype.readBigUInt64LE = defineBigIntMethod(function readBigUInt64LE(offset) {
         offset = offset >>> 0;
         validateNumber(offset, "offset");
-        const first2 = this[offset];
+        const first3 = this[offset];
         const last = this[offset + 7];
-        if (first2 === void 0 || last === void 0) {
+        if (first3 === void 0 || last === void 0) {
           boundsError(offset, this.length - 8);
         }
-        const lo = first2 + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 24;
+        const lo = first3 + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 24;
         const hi = this[++offset] + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + last * 2 ** 24;
         return BigInt(lo) + (BigInt(hi) << BigInt(32));
       });
       Buffer3.prototype.readBigUInt64BE = defineBigIntMethod(function readBigUInt64BE(offset) {
         offset = offset >>> 0;
         validateNumber(offset, "offset");
-        const first2 = this[offset];
+        const first3 = this[offset];
         const last = this[offset + 7];
-        if (first2 === void 0 || last === void 0) {
+        if (first3 === void 0 || last === void 0) {
           boundsError(offset, this.length - 8);
         }
-        const hi = first2 * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + this[++offset];
+        const hi = first3 * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + this[++offset];
         const lo = this[++offset] * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + last;
         return (BigInt(hi) << BigInt(32)) + BigInt(lo);
       });
@@ -1189,23 +1189,23 @@
       Buffer3.prototype.readBigInt64LE = defineBigIntMethod(function readBigInt64LE(offset) {
         offset = offset >>> 0;
         validateNumber(offset, "offset");
-        const first2 = this[offset];
+        const first3 = this[offset];
         const last = this[offset + 7];
-        if (first2 === void 0 || last === void 0) {
+        if (first3 === void 0 || last === void 0) {
           boundsError(offset, this.length - 8);
         }
         const val = this[offset + 4] + this[offset + 5] * 2 ** 8 + this[offset + 6] * 2 ** 16 + (last << 24);
-        return (BigInt(val) << BigInt(32)) + BigInt(first2 + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 24);
+        return (BigInt(val) << BigInt(32)) + BigInt(first3 + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 24);
       });
       Buffer3.prototype.readBigInt64BE = defineBigIntMethod(function readBigInt64BE(offset) {
         offset = offset >>> 0;
         validateNumber(offset, "offset");
-        const first2 = this[offset];
+        const first3 = this[offset];
         const last = this[offset + 7];
-        if (first2 === void 0 || last === void 0) {
+        if (first3 === void 0 || last === void 0) {
           boundsError(offset, this.length - 8);
         }
-        const val = (first2 << 24) + // Overflow
+        const val = (first3 << 24) + // Overflow
         this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + this[++offset];
         return (BigInt(val) << BigInt(32)) + BigInt(this[++offset] * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + last);
       });
@@ -7796,9 +7796,9 @@
         return result2;
       }
       function flatMap(fn, options) {
-        const values = map.call(this, fn, options);
+        const values2 = map.call(this, fn, options);
         return async function* flatMap2() {
-          for await (const val of values) {
+          for await (const val of values2) {
             yield* val;
           }
         }.call(this);
@@ -10746,7 +10746,7 @@
   }
   var browser_default2 = oidc;
 
-  // node_modules/@muze-nl/oldm/src/oldm.mjs
+  // node_modules/@muze-nl/oldm-core/src/oldm.mjs
   var oldm_exports = {};
   __export(oldm_exports, {
     BlankNode: () => BlankNode,
@@ -10785,68 +10785,405 @@
     vcard: "http://www.w3.org/2006/vcard/ns#",
     xsd: "http://www.w3.org/2001/XMLSchema#"
   };
-  function one(values, whichOne = "last") {
-    let result2 = values;
-    if (Array.isArray(values)) {
+  function one(values2, whichOne = "last") {
+    let result2 = values2;
+    if (Array.isArray(values2)) {
       if (whichOne == "last") {
-        result2 = values[values.length - 1];
+        result2 = values2[values2.length - 1];
       } else if (whichOne == "first") {
-        result2 = values[0];
+        result2 = values2[0];
       } else if (typeof whichOne == "function") {
-        result2 = whichOne(values);
+        result2 = whichOne(values2);
       } else {
         throw new Error("Unknown value for whichOne parameter");
       }
     }
     return result2;
   }
-  function many(values) {
-    if (Array.isArray(values)) {
-      return values;
+  function many(values2) {
+    if (Array.isArray(values2)) {
+      return values2;
     }
-    if (values == null) {
+    if (values2 == null) {
       return [];
     }
-    return [values];
+    return [values2];
   }
-  function first(...values) {
-    for (const value of values) {
+  function first(...values2) {
+    for (const value of values2) {
       if (value !== null && value !== void 0) {
         return value;
       }
     }
     return null;
   }
+  function values(value) {
+    if (Array.isArray(value) && !(value instanceof Collection)) {
+      return value;
+    }
+    if (value === void 0) {
+      return [];
+    }
+    return [value];
+  }
+  function mergeValue(existing, value) {
+    const result2 = values(existing);
+    for (const item of values(value)) {
+      if (!result2.some((existingItem) => sameValue(existingItem, item))) {
+        result2.push(item);
+      }
+    }
+    if (result2.length == 0) {
+      return void 0;
+    }
+    if (result2.length == 1) {
+      return result2[0];
+    }
+    return result2;
+  }
+  function sameValue(left, right) {
+    if (left === right) {
+      return true;
+    }
+    if (left instanceof NamedNode && right instanceof NamedNode) {
+      return left.id == right.id;
+    }
+    if (left instanceof NamedNode && typeof right == "string") {
+      return left.id == right;
+    }
+    if (typeof left == "string" && right instanceof NamedNode) {
+      return left == right.id;
+    }
+    if (left instanceof Collection && right instanceof Collection) {
+      return left.length == right.length && left.every((item, index) => sameValue(item, right[index]));
+    }
+    if (isLiteral(left) && isLiteral(right)) {
+      return String(left) == String(right) && left?.type == right?.type && left?.language == right?.language;
+    }
+    return false;
+  }
+  function sameSourceValue(left, right) {
+    if (left === right) {
+      return true;
+    }
+    if (left instanceof NamedNode && right instanceof NamedNode) {
+      return left.id == right.id;
+    }
+    if (left instanceof NamedNode && typeof right == "string") {
+      return left.id == right;
+    }
+    if (typeof left == "string" && right instanceof NamedNode) {
+      return left == right.id;
+    }
+    if (left instanceof Collection && right instanceof Collection) {
+      return left.length == right.length && left.every((item, index) => sameSourceValue(item, right[index]));
+    }
+    if (isLiteral(left) && isLiteral(right)) {
+      const leftType = left?.type;
+      const rightType = right?.type;
+      const leftLanguage = left?.language;
+      const rightLanguage = right?.language;
+      return String(left) == String(right) && (!leftType || !rightType || leftType == rightType) && (!leftLanguage || !rightLanguage || leftLanguage == rightLanguage);
+    }
+    return false;
+  }
+  function resolveValue(value, subjects, context) {
+    if (value instanceof Collection) {
+      const collection = new Collection(context);
+      for (const item of value) {
+        collection.push(resolveValue(item, subjects, context));
+      }
+      return collection;
+    }
+    if (Array.isArray(value)) {
+      return value.map((item) => resolveValue(item, subjects, context));
+    }
+    if (value instanceof NamedNode && subjects[value.id]) {
+      return subjects[value.id];
+    }
+    return value;
+  }
+  function isLiteral(value) {
+    return value instanceof String || value instanceof Number || typeof value == "boolean" || typeof value == "string" || typeof value == "number";
+  }
   var Context = class {
+    #buildingSubjects = false;
     constructor(options) {
-      this.prefixes = { ...prefixes, ...options?.prefixes };
+      const clientPrefixes = options?.prefixes ?? {};
+      this.prefixes = { ...prefixes, ...clientPrefixes };
+      this.prefixOrder = [
+        ...Object.keys(clientPrefixes),
+        ...Object.keys(prefixes).filter((prefix2) => !(prefix2 in clientPrefixes))
+      ];
       if (!this.prefixes["xsd"]) {
         this.prefixes["xsd"] = "http://www.w3.org/2001/XMLSchema#";
+        this.prefixOrder.push("xsd");
       }
       this.parser = options?.parser;
       this.writer = options?.writer;
-      this.sources = /* @__PURE__ */ Object.create(null);
+      this.graphs = [];
+      this.graphsByUrl = /* @__PURE__ */ Object.create(null);
+      this.defaultGraph = options?.defaultGraph ?? null;
       this.separator = options?.separator ?? "$";
+      Object.defineProperty(this, "subjects", {
+        get() {
+          return this.getSubjects();
+        }
+      });
+      Object.defineProperty(this, "data", {
+        get() {
+          return Object.values(this.subjects);
+        }
+      });
     }
     parse(input, url2, type) {
-      const { quads, prefixes: prefixes3 } = this.parser(input, url2, type);
-      if (prefixes3) {
-        for (let prefix2 in prefixes3) {
-          let prefixURL = prefixes3[prefix2];
+      const { quads, prefixes: prefixes4 } = this.parser(input, url2, type);
+      if (prefixes4) {
+        for (let prefix2 in prefixes4) {
+          let prefixURL = prefixes4[prefix2];
           if (prefixURL.match(/^http(s?):\/\/$/i)) {
             prefixURL += url2.substring(prefixURL.length);
           } else try {
-            prefixURL = new URL(prefixes3[prefix2], url2).href;
+            prefixURL = new URL(prefixes4[prefix2], url2).href;
           } catch (err) {
-            console.error("Could not parse prefix", prefixes3[prefix2], err.message);
+            console.error("Could not parse prefix", prefixes4[prefix2], err.message);
           }
           if (!this.prefixes[prefix2]) {
             this.prefixes[prefix2] = prefixURL;
+            this.prefixOrder.push(prefix2);
           }
         }
       }
-      this.sources[url2] = new Graph(quads, url2, type, prefixes3, this);
-      return this.sources[url2];
+      return this.addGraph(new Graph(quads, url2, type, prefixes4, this));
+    }
+    addGraph(graph) {
+      if (!graph?.url) {
+        throw new Error("Cannot add graph without a url");
+      }
+      const existing = this.graphsByUrl[graph.url];
+      if (existing) {
+        const index = this.graphs.indexOf(existing);
+        if (index >= 0) {
+          this.graphs[index] = graph;
+        }
+      } else {
+        this.graphs.push(graph);
+      }
+      this.graphsByUrl[graph.url] = graph;
+      return graph;
+    }
+    graph(url2) {
+      return this.graphsByUrl[this.fullURI(url2)];
+    }
+    set(subject, predicate, value, options = {}) {
+      return this.resolveGraph(subject, options).set(subject, predicate, value);
+    }
+    add(subject, predicate, value, options = {}) {
+      return this.resolveGraph(subject, options).add(subject, predicate, value);
+    }
+    delete(subject, predicate = null, value = void 0, options = {}) {
+      const graph = this.resolveGraph(subject, options);
+      if (arguments.length < 3) {
+        return graph.delete(subject, predicate);
+      }
+      return graph.delete(subject, predicate, value);
+    }
+    resolveGraph(subject, options = {}) {
+      if (options.graph) {
+        return this.getGraphOption(options.graph);
+      }
+      if (subject instanceof BlankNode && subject.graph instanceof Graph) {
+        return subject.graph;
+      }
+      const id = this.subjectID(subject);
+      if (id) {
+        const exactGraph = this.graphsByUrl[id];
+        if (exactGraph) {
+          return exactGraph;
+        }
+        const documentGraph = this.graphsByUrl[this.documentURL(id)];
+        if (documentGraph) {
+          return documentGraph;
+        }
+        const subjectSources = this.graphs.filter((graph) => graph.subjects[id]);
+        if (subjectSources.length == 1) {
+          return subjectSources[0];
+        }
+        if (subjectSources.length > 1) {
+          throw new Error(`Cannot choose a source graph for ${id}. Use context.set/add/delete(..., { graph }) or graph.set/add/delete(...) to choose one explicitly.`);
+        }
+      }
+      if (this.defaultGraph) {
+        return this.getGraphOption(this.defaultGraph);
+      }
+      if (this.graphs.length == 1) {
+        return this.graphs[0];
+      }
+      throw new Error("Cannot choose a source graph. Use context.set/add/delete(..., { graph }) or graph.set/add/delete(...) to choose one explicitly.");
+    }
+    getGraphOption(graph) {
+      if (graph instanceof Graph) {
+        if (!this.graphs.includes(graph)) {
+          throw new Error("The selected graph is not part of this context");
+        }
+        return graph;
+      }
+      const resolved = this.graph(graph);
+      if (!resolved) {
+        throw new Error(`Unknown graph: ${graph}`);
+      }
+      return resolved;
+    }
+    documentURL(id) {
+      try {
+        const url2 = new URL(id);
+        url2.hash = "";
+        return url2.href;
+      } catch (err) {
+        return id;
+      }
+    }
+    sources(subject, predicate = null, value = void 0) {
+      if (!subject) {
+        return [...this.graphs];
+      }
+      if (subject instanceof BlankNode && !(subject instanceof NamedNode)) {
+        return this.sourcesForBlankNode(subject, predicate, value, arguments.length >= 3);
+      }
+      const id = this.subjectID(subject);
+      if (!id) {
+        return [];
+      }
+      return this.graphs.filter((graph) => {
+        const graphSubject = graph.subjects[id];
+        return graphSubject && this.subjectHasSource(graphSubject, predicate, value, arguments.length >= 3);
+      });
+    }
+    sourcesForBlankNode(subject, predicate, value, hasValue) {
+      const graph = subject.graph;
+      if (!(graph instanceof Graph)) {
+        return [];
+      }
+      if (this.subjectHasSource(subject, predicate, value, hasValue)) {
+        return [graph];
+      }
+      return [];
+    }
+    subjectHasSource(subject, predicate, value, hasValue) {
+      if (!predicate) {
+        return true;
+      }
+      const property = this.propertyName(predicate);
+      if (!(property in subject)) {
+        return false;
+      }
+      if (!hasValue) {
+        return true;
+      }
+      return values(subject[property]).some((item) => sameSourceValue(item, value));
+    }
+    subjectID(subject) {
+      if (subject?.id) {
+        return this.fullURI(subject.id);
+      }
+      if (typeof subject == "string") {
+        return this.fullURI(subject);
+      }
+      return null;
+    }
+    propertyName(predicate) {
+      if (predicate?.id) {
+        predicate = predicate.id;
+      }
+      if (predicate == "a" || predicate == rdfType || this.fullURI(predicate) == rdfType) {
+        return "a";
+      }
+      return this.shortURI(this.fullURI(predicate));
+    }
+    get(shortID) {
+      return this.subjects[this.fullURI(shortID)];
+    }
+    getSubjects() {
+      const subjects = /* @__PURE__ */ Object.create(null);
+      this.#buildingSubjects = true;
+      try {
+        for (const graph of this.graphs) {
+          for (const id of Object.keys(graph.subjects)) {
+            if (!subjects[id]) {
+              subjects[id] = this.contextSubject(new NamedNode(id, this));
+            }
+          }
+        }
+        for (const graph of this.graphs) {
+          for (const [id, subject] of Object.entries(graph.subjects)) {
+            this.mergeSubject(subjects[id], subject, subjects);
+          }
+        }
+      } finally {
+        this.#buildingSubjects = false;
+      }
+      return subjects;
+    }
+    mergeSubject(target, source, subjects) {
+      for (const [predicate, value] of Object.entries(source)) {
+        if (predicate == "id") {
+          continue;
+        }
+        target[predicate] = mergeValue(
+          target[predicate],
+          resolveValue(value, subjects, this)
+        );
+      }
+    }
+    contextSubject(subject) {
+      const context = this;
+      return new Proxy(subject, {
+        set(target, property, value, receiver) {
+          if (context.#buildingSubjects || typeof property == "symbol" || property == "id" || property == "graph") {
+            return Reflect.set(target, property, value, receiver);
+          }
+          context.set(target.id, property, value);
+          context.updateContextProperty(target, property);
+          return true;
+        },
+        deleteProperty(target, property) {
+          if (context.#buildingSubjects || typeof property == "symbol" || property == "id" || property == "graph") {
+            return Reflect.deleteProperty(target, property);
+          }
+          context.delete(target.id, property);
+          context.updateContextProperty(target, property);
+          return true;
+        }
+      });
+    }
+    updateContextProperty(target, property) {
+      const updated = this.get(target.id);
+      if (updated && property in updated) {
+        target[property] = updated[property];
+      } else {
+        delete target[property];
+      }
+    }
+    fullURI(shortURI, separator = null) {
+      if (!separator) {
+        separator = this.separator;
+      }
+      const [prefix2, path] = shortURI.split(separator);
+      if (path && this.prefixes[prefix2]) {
+        return this.prefixes[prefix2] + path;
+      }
+      return shortURI;
+    }
+    shortURI(fullURI, separator = null) {
+      if (!separator) {
+        separator = this.separator;
+      }
+      for (const prefix2 of this.prefixOrder) {
+        if (fullURI.startsWith(this.prefixes[prefix2])) {
+          return prefix2 + separator + fullURI.substring(this.prefixes[prefix2].length);
+        }
+      }
+      return fullURI;
     }
     setType(literal2, shortType) {
       if (!shortType) {
@@ -10854,7 +11191,7 @@
       }
       if (typeof literal2 == "string") {
         literal2 = new String(literal2);
-      } else if (typeof result == "number") {
+      } else if (typeof literal2 == "number") {
         literal2 = new Number(literal2);
       }
       if (typeof literal2 !== "object") {
@@ -10872,10 +11209,10 @@
   };
   var Graph = class {
     #blankNodes = /* @__PURE__ */ Object.create(null);
-    constructor(quads, url2, mimetype, prefixes3, context) {
+    constructor(quads, url2, mimetype, prefixes4, context) {
       this.mimetype = mimetype;
       this.url = url2;
-      this.prefixes = prefixes3;
+      this.prefixes = prefixes4;
       this.context = context;
       this.subjects = /* @__PURE__ */ Object.create(null);
       for (let quad2 of quads) {
@@ -10886,7 +11223,7 @@
           switch (shortPred) {
             case "rdf:first":
               subject = this.addCollection(quad2.subject.id);
-              shortObj = this.shortURI(quad2.object.id, ":");
+              shortObj = quad2.object.id ? this.shortURI(quad2.object.id, ":") : null;
               if (shortObj != "rdf:nil") {
                 const value = this.getValue(quad2.object);
                 if (value) {
@@ -10942,13 +11279,140 @@
     get(shortID) {
       return this.subjects[this.fullURI(shortID)];
     }
+    set(subject, predicate, value) {
+      const node = this.ensureSubject(subject);
+      const property = this.context.propertyName(predicate);
+      if (property == "a") {
+        node.a = this.normalizeTypeValues(value);
+      } else {
+        node[property] = this.normalizeValues(value);
+      }
+      return node;
+    }
+    add(subject, predicate, value) {
+      const node = this.ensureSubject(subject);
+      const property = this.context.propertyName(predicate);
+      const newValue = property == "a" ? this.normalizeTypeValues(value) : this.normalizeValues(value);
+      node[property] = mergeValue(node[property], newValue);
+      return node;
+    }
+    delete(subject, predicate = null, value = void 0) {
+      const node = this.findSubject(subject);
+      if (!node) {
+        return false;
+      }
+      if (!predicate) {
+        if (node.id) {
+          delete this.subjects[node.id];
+          if (this.primary === node) {
+            this.primary = null;
+          }
+        }
+        return true;
+      }
+      const property = this.context.propertyName(predicate);
+      if (!(property in node)) {
+        return false;
+      }
+      if (arguments.length < 3) {
+        delete node[property];
+        return true;
+      }
+      const deleteValues = property == "a" ? values(this.normalizeTypeValues(value)) : values(this.normalizeValues(value));
+      const remaining = values(node[property]).filter((item) => !deleteValues.some((deleteValue) => sameValue(item, deleteValue)));
+      if (remaining.length == values(node[property]).length) {
+        return false;
+      }
+      if (remaining.length == 0) {
+        delete node[property];
+      } else if (remaining.length == 1) {
+        node[property] = remaining[0];
+      } else {
+        node[property] = remaining;
+      }
+      return true;
+    }
+    ensureSubject(subject) {
+      if (subject instanceof BlankNode && !(subject instanceof NamedNode)) {
+        if (subject.graph !== this) {
+          throw new Error("Cannot write a blank node into a different graph");
+        }
+        return subject;
+      }
+      if (subject instanceof NamedNode) {
+        return this.addNamedNode(subject.id);
+      }
+      return this.addNamedNode(this.fullURI(subject));
+    }
+    findSubject(subject) {
+      if (subject instanceof BlankNode && !(subject instanceof NamedNode)) {
+        return subject.graph === this ? subject : null;
+      }
+      const id = subject?.id ? subject.id : this.fullURI(subject);
+      return this.subjects[id];
+    }
+    normalizeValues(value) {
+      if (Array.isArray(value) && !(value instanceof Collection)) {
+        return value.map((item) => this.normalizeValue(item));
+      }
+      return this.normalizeValue(value);
+    }
+    normalizeValue(value) {
+      if (value instanceof Collection) {
+        const collection = new Collection(this);
+        for (const item of value) {
+          collection.push(this.normalizeValue(item));
+        }
+        return collection;
+      }
+      if (value instanceof NamedNode) {
+        return this.addNamedNode(value.id);
+      }
+      if (value instanceof BlankNode) {
+        if (value.graph !== this) {
+          throw new Error("Cannot write a blank node into a different graph");
+        }
+        return value;
+      }
+      if (this.looksLikeURI(value)) {
+        return this.addNamedNode(this.fullURI(value));
+      }
+      return value;
+    }
+    normalizeTypeValues(value) {
+      if (Array.isArray(value) && !(value instanceof Collection)) {
+        return value.map((item) => this.normalizeTypeValue(item));
+      }
+      return this.normalizeTypeValue(value);
+    }
+    normalizeTypeValue(value) {
+      if (value instanceof NamedNode) {
+        return this.shortURI(value.id);
+      }
+      return this.shortURI(this.fullURI(value));
+    }
+    looksLikeURI(value) {
+      if (typeof value != "string") {
+        return false;
+      }
+      if (/^[a-z][a-z0-9+.-]*:/i.test(value)) {
+        return true;
+      }
+      const [prefix2, path] = value.split(this.context.separator);
+      return Boolean(path && this.context.prefixes[prefix2]);
+    }
     fullURI(shortURI, separator = null) {
       if (!separator) {
         separator = this.context.separator;
       }
       const [prefix2, path] = shortURI.split(separator);
       if (path) {
-        return this.prefixes[prefix2] + path;
+        if (this.context.prefixes[prefix2]) {
+          return this.context.prefixes[prefix2] + path;
+        }
+        if (this.prefixes[prefix2]) {
+          return this.prefixes[prefix2] + path;
+        }
       }
       return shortURI;
     }
@@ -10956,7 +11420,7 @@
       if (!separator) {
         separator = this.context.separator;
       }
-      for (let prefix2 in this.context.prefixes) {
+      for (const prefix2 of this.context.prefixOrder) {
         if (fullURI.startsWith(this.context.prefixes[prefix2])) {
           return prefix2 + separator + fullURI.substring(this.context.prefixes[prefix2].length);
         }
@@ -10982,7 +11446,7 @@
     setLanguage(literal2, language) {
       if (typeof literal2 == "string") {
         literal2 = new String(literal2);
-      } else if (typeof result == "number") {
+      } else if (typeof literal2 == "number") {
         literal2 = new Number(literal2);
       }
       if (typeof literal2 !== "object") {
@@ -11065,7 +11529,7 @@
     }
   };
   var Collection = class extends Array {
-    constructor(id, graph) {
+    constructor(graph) {
       super();
       Object.defineProperty(this, "graph", {
         value: graph,
@@ -11075,7 +11539,7 @@
     }
   };
 
-  // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
+  // node_modules/@muze-nl/oldm-n3/src/oldm-n3.mjs
   var oldm_n3_exports = {};
   __export(oldm_n3_exports, {
     n3Parser: () => n3Parser,
@@ -11152,6 +11616,9 @@
     "%": "%"
   };
   var illegalIriChars = /[\x00-\x20<>\\"\{\}\|\^\`]/;
+  function isSurrogateCodePoint(charCode) {
+    return charCode >= 55296 && charCode <= 57343;
+  }
   var lineModeRegExps = {
     _iri: true,
     _unescapedIri: true,
@@ -11457,10 +11924,20 @@
     _unescape(item) {
       let invalid = false;
       const replaced = item.replace(escapeSequence, (sequence, unicode4, unicode8, escapedChar) => {
-        if (typeof unicode4 === "string")
-          return String.fromCharCode(Number.parseInt(unicode4, 16));
+        if (typeof unicode4 === "string") {
+          const charCode = Number.parseInt(unicode4, 16);
+          if (isSurrogateCodePoint(charCode)) {
+            invalid = true;
+            return "";
+          }
+          return String.fromCharCode(charCode);
+        }
         if (typeof unicode8 === "string") {
           let charCode = Number.parseInt(unicode8, 16);
+          if (isSurrogateCodePoint(charCode)) {
+            invalid = true;
+            return "";
+          }
           return charCode <= 65535 ? String.fromCharCode(Number.parseInt(unicode8, 16)) : String.fromCharCode(55296 + ((charCode -= 65536) >> 10), 56320 + (charCode & 1023));
         }
         if (escapedChar in escapeReplacements)
@@ -12975,7 +13452,7 @@
     inDefaultGraph: () => inDefaultGraph,
     isBlankNode: () => isBlankNode,
     isDefaultGraph: () => isDefaultGraph,
-    isLiteral: () => isLiteral,
+    isLiteral: () => isLiteral2,
     isNamedNode: () => isNamedNode,
     isQuad: () => isQuad,
     isVariable: () => isVariable,
@@ -12988,7 +13465,7 @@
   function isBlankNode(term) {
     return !!term && term.termType === "BlankNode";
   }
-  function isLiteral(term) {
+  function isLiteral2(term) {
     return !!term && term.termType === "Literal";
   }
   function isVariable(term) {
@@ -13007,20 +13484,20 @@
     return prefixes2({ "": iri.value || iri }, factory)("");
   }
   function prefixes2(defaultPrefixes, factory) {
-    const prefixes3 = /* @__PURE__ */ Object.create(null);
+    const prefixes4 = /* @__PURE__ */ Object.create(null);
     for (const prefix2 in defaultPrefixes)
       processPrefix(prefix2, defaultPrefixes[prefix2]);
     factory = factory || N3DataFactory_default;
     function processPrefix(prefix2, iri) {
       if (typeof iri === "string") {
         const cache = /* @__PURE__ */ Object.create(null);
-        prefixes3[prefix2] = (local) => {
+        prefixes4[prefix2] = (local) => {
           return cache[local] || (cache[local] = factory.namedNode(iri + local));
         };
-      } else if (!(prefix2 in prefixes3)) {
+      } else if (!(prefix2 in prefixes4)) {
         throw new Error(`Unknown prefix: ${prefix2}`);
       }
-      return prefixes3[prefix2];
+      return prefixes4[prefix2];
     }
     return processPrefix;
   }
@@ -13301,17 +13778,17 @@
     }
     // ### `addPrefix` adds the prefix to the output stream
     addPrefix(prefix2, iri, done) {
-      const prefixes3 = {};
-      prefixes3[prefix2] = iri;
-      this.addPrefixes(prefixes3, done);
+      const prefixes4 = {};
+      prefixes4[prefix2] = iri;
+      this.addPrefixes(prefixes4, done);
     }
     // ### `addPrefixes` adds the prefixes to the output stream
-    addPrefixes(prefixes3, done) {
+    addPrefixes(prefixes4, done) {
       if (!this._prefixIRIs)
         return done && done();
       let hasPrefixes = false;
-      for (let prefix2 in prefixes3) {
-        let iri = prefixes3[prefix2];
+      for (let prefix2 in prefixes4) {
+        let iri = prefixes4[prefix2];
         if (typeof iri !== "string")
           iri = iri.value;
         hasPrefixes = true;
@@ -13574,9 +14051,9 @@
           for (const value1 in index1) {
             if (index2 = index1[value1]) {
               parts[name1] = this._termFromId(entityKeys[value1]);
-              const values = key2 ? key2 in index2 ? [key2] : [] : Object.keys(index2);
-              for (let l = 0; l < values.length; l++) {
-                parts[name2] = this._termFromId(entityKeys[values[l]]);
+              const values2 = key2 ? key2 in index2 ? [key2] : [] : Object.keys(index2);
+              for (let l = 0; l < values2.length; l++) {
+                parts[name2] = this._termFromId(entityKeys[values2[l]]);
                 yield this._factory.quad(parts.subject, parts.predicate, parts.object, graph);
               }
             }
@@ -14019,7 +14496,7 @@
         while (current && !malformed) {
           const objectQuads = this.getQuads(null, null, current, null);
           const subjectQuads = this.getQuads(current, null, null, null);
-          let quad2, first2 = null, rest = null, parent = null;
+          let quad2, first3 = null, rest = null, parent = null;
           for (let i = 0; i < subjectQuads.length && !malformed; i++) {
             quad2 = subjectQuads[i];
             if (!quad2.graph.equals(graph))
@@ -14027,10 +14504,10 @@
             else if (head)
               malformed = onError(current, "has non-list arcs out");
             else if (quad2.predicate.value === IRIs_default.rdf.first) {
-              if (first2)
+              if (first3)
                 malformed = onError(current, "has multiple rdf:first arcs");
               else
-                toRemove.push(first2 = quad2);
+                toRemove.push(first3 = quad2);
             } else if (quad2.predicate.value === IRIs_default.rdf.rest) {
               if (rest)
                 malformed = onError(current, "has multiple rdf:rest arcs");
@@ -14057,10 +14534,10 @@
               headPos = "object";
             }
           }
-          if (!first2)
+          if (!first3)
             malformed = onError(current, "has no list head");
           else
-            items.unshift(first2.object);
+            items.unshift(first3.object);
           current = parent && parent.subject;
         }
         if (malformed)
@@ -14441,7 +14918,6 @@
       this._store._addToIndex(graphItem.objects, object, subject, predicate);
       cb();
     }
-    // eslint-disable-next-line no-warning-comments
     _evaluatePremise(rule, content, cb, i = 0) {
       let v1, v2, value, index1, index2;
       const [val0, val1, val2] = rule.premise[i].value, index = content[rule.premise[i].content];
@@ -14715,29 +15191,32 @@
     termToId
   };
 
-  // node_modules/@muze-nl/oldm/src/oldm-n3.mjs
+  // node_modules/@muze-nl/oldm-n3/src/oldm-n3.mjs
   var n3Parser = (input, uri, type) => {
-    const parser = new src_default.Parser({
+    const parser = new N3Parser({
       baseIRI: uri,
       blankNodePrefix: "",
       format: type
     });
-    let prefixes3 = /* @__PURE__ */ Object.create(null);
+    let prefixes4 = /* @__PURE__ */ Object.create(null);
     const quads = parser.parse(input, null, (prefix2, url2) => {
-      prefixes3[prefix2] = url2.id;
+      prefixes4[prefix2] = url2.id;
     });
-    return { quads, prefixes: prefixes3 };
+    return { quads, prefixes: prefixes4 };
   };
   var n3Writer = (source) => {
     return new Promise((resolve, reject) => {
-      const writer = new src_default.Writer({
-        format: source.type,
+      const writer = new N3Writer({
+        format: source.mimetype,
         prefixes: { ...source.prefixes }
       });
       const xsd4 = source.prefixes.xsd;
-      const { quad: quad2, namedNode: namedNode2, literal: literal2, blankNode: blankNode2 } = src_default.DataFactory;
+      const { quad: quad2, namedNode: namedNode2, literal: literal2, blankNode: blankNode2 } = N3DataFactory_default;
       const writeClassNames = (id, subject) => {
         let classNames = subject.a;
+        if (!classNames) {
+          return;
+        }
         if (!Array.isArray(classNames)) {
           classNames = [classNames];
         }
@@ -14790,7 +15269,7 @@
             pred.object = namedNode2(object2.id);
           } else if (object2 instanceof BlankNode) {
             pred.object = getBlankNode(object2);
-          } else if (isLiteral2(object2)) {
+          } else if (isLiteral3(object2)) {
             pred.object = getLiteral(object2);
           } else {
             console.log("oldm-ns: encountered unknown object", object2, predicate);
@@ -14821,13 +15300,13 @@
         }
         return literal2(object, type);
       };
-      const isLiteral2 = (value) => {
+      const isLiteral3 = (value) => {
         return value instanceof String || value instanceof Number || typeof value == "boolean" || typeof value == "string" || typeof value == "number";
       };
       const getCollection = (object) => {
         let list = [];
         for (let value of object) {
-          if (isLiteral2(value)) {
+          if (isLiteral3(value)) {
             list.push(getLiteral(value));
           } else if (value.id) {
             list.push(namedNode2(value.id));
@@ -14840,10 +15319,10 @@
       const getBlankNode = (object) => {
         return writer.blank(getPredicates(object));
       };
-      const getArray = (id, object) => {
+      const getArray = (object) => {
         let list = [];
         for (const o of object) {
-          if (isLiteral2(o)) {
+          if (isLiteral3(o)) {
             list.push(getLiteral(o));
           } else if (o instanceof NamedNode) {
             list.push(namedNode2(o.id));
@@ -14871,13 +15350,24 @@
   };
 
   // node_modules/@muze-nl/oldm/src/index.mjs
+  var { default: _coreDefault, ...core } = oldm_exports;
   var oldm3 = {
-    context: oldm2,
-    ...oldm_exports,
+    context(options = {}) {
+      const {
+        parser = n3Parser,
+        writer = n3Writer,
+        ...contextOptions
+      } = options;
+      return oldm2({
+        ...contextOptions,
+        parser,
+        writer
+      });
+    },
+    ...core,
     ...oldm_n3_exports
   };
   globalThis.oldm = oldm3;
-  var src_default2 = oldm3;
 
   // node_modules/@muze-nl/jaqt/src/jaqt.mjs
   function isPrimitiveWrapper(data) {
@@ -15328,6 +15818,504 @@
   };
   var _ = new Proxy(getPointerFn(), pointerHandler());
 
+  // node_modules/@muze-nl/metro-oldm/node_modules/@muze-nl/oldm/src/oldm.mjs
+  var oldm_exports2 = {};
+  __export(oldm_exports2, {
+    BlankNode: () => BlankNode3,
+    Collection: () => Collection2,
+    Context: () => Context2,
+    Graph: () => Graph2,
+    NamedNode: () => NamedNode3,
+    default: () => oldm4,
+    first: () => first2,
+    many: () => many2,
+    one: () => one2,
+    prefixes: () => prefixes3,
+    rdfType: () => rdfType2
+  });
+  function oldm4(options) {
+    return new Context2(options);
+  }
+  var rdfType2 = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+  var prefixes3 = {
+    acl: "http://www.w3.org/ns/auth/acl#",
+    acp: "http://www.w3.org/ns/solid/acp#",
+    dcterms: "http://purl.org/dc/terms/",
+    foaf: "http://xmlns.com/foaf/0.1/",
+    ldn: "https://www.w3.org/ns/ldn#",
+    ldp: "http://www.w3.org/ns/ldp#",
+    notify: "http://www.w3.org/ns/solid/notifications#",
+    oidc: "http://www.w3.org/ns/solid/oidc#",
+    owl: "http://www.w3.org/2002/07/owl#",
+    pim: "http://www.w3.org/ns/pim/space#",
+    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+    schema: "http://schema.org/",
+    solid: "http://www.w3.org/ns/solid/terms#",
+    stat: "http://www.w3.org/ns/posix/stat#",
+    turtle: "http://www.w3.org/ns/iana/media-types/text/turtle#",
+    vcard: "http://www.w3.org/2006/vcard/ns#",
+    xsd: "http://www.w3.org/2001/XMLSchema#"
+  };
+  function one2(values2, whichOne = "last") {
+    let result2 = values2;
+    if (Array.isArray(values2)) {
+      if (whichOne == "last") {
+        result2 = values2[values2.length - 1];
+      } else if (whichOne == "first") {
+        result2 = values2[0];
+      } else if (typeof whichOne == "function") {
+        result2 = whichOne(values2);
+      } else {
+        throw new Error("Unknown value for whichOne parameter");
+      }
+    }
+    return result2;
+  }
+  function many2(values2) {
+    if (Array.isArray(values2)) {
+      return values2;
+    }
+    if (values2 == null) {
+      return [];
+    }
+    return [values2];
+  }
+  function first2(...values2) {
+    for (const value of values2) {
+      if (value !== null && value !== void 0) {
+        return value;
+      }
+    }
+    return null;
+  }
+  var Context2 = class {
+    constructor(options) {
+      this.prefixes = { ...prefixes3, ...options?.prefixes };
+      if (!this.prefixes["xsd"]) {
+        this.prefixes["xsd"] = "http://www.w3.org/2001/XMLSchema#";
+      }
+      this.parser = options?.parser;
+      this.writer = options?.writer;
+      this.sources = /* @__PURE__ */ Object.create(null);
+      this.separator = options?.separator ?? "$";
+    }
+    parse(input, url2, type) {
+      const { quads, prefixes: prefixes4 } = this.parser(input, url2, type);
+      if (prefixes4) {
+        for (let prefix2 in prefixes4) {
+          let prefixURL = prefixes4[prefix2];
+          if (prefixURL.match(/^http(s?):\/\/$/i)) {
+            prefixURL += url2.substring(prefixURL.length);
+          } else try {
+            prefixURL = new URL(prefixes4[prefix2], url2).href;
+          } catch (err) {
+            console.error("Could not parse prefix", prefixes4[prefix2], err.message);
+          }
+          if (!this.prefixes[prefix2]) {
+            this.prefixes[prefix2] = prefixURL;
+          }
+        }
+      }
+      this.sources[url2] = new Graph2(quads, url2, type, prefixes4, this);
+      return this.sources[url2];
+    }
+    setType(literal2, shortType) {
+      if (!shortType) {
+        return literal2;
+      }
+      if (typeof literal2 == "string") {
+        literal2 = new String(literal2);
+      } else if (typeof result == "number") {
+        literal2 = new Number(literal2);
+      }
+      if (typeof literal2 !== "object") {
+        throw new Error("cannot set type on ", literal2, shortType);
+      }
+      literal2.type = shortType;
+      return literal2;
+    }
+    getType(literal2) {
+      if (literal2 && typeof literal2 == "object") {
+        return literal2.type;
+      }
+      return null;
+    }
+  };
+  var Graph2 = class {
+    #blankNodes = /* @__PURE__ */ Object.create(null);
+    constructor(quads, url2, mimetype, prefixes4, context) {
+      this.mimetype = mimetype;
+      this.url = url2;
+      this.prefixes = prefixes4;
+      this.context = context;
+      this.subjects = /* @__PURE__ */ Object.create(null);
+      for (let quad2 of quads) {
+        let subject;
+        if (quad2.subject.termType == "BlankNode") {
+          let shortPred = this.shortURI(quad2.predicate.id, ":");
+          let shortObj;
+          switch (shortPred) {
+            case "rdf:first":
+              subject = this.addCollection(quad2.subject.id);
+              shortObj = this.shortURI(quad2.object.id, ":");
+              if (shortObj != "rdf:nil") {
+                const value = this.getValue(quad2.object);
+                if (value) {
+                  subject.push(value);
+                }
+              }
+              continue;
+            case "rdf:rest":
+              this.#blankNodes[quad2.object.id] = this.#blankNodes[quad2.subject.id];
+              continue;
+            default:
+              subject = this.addBlankNode(quad2.subject.id);
+              break;
+          }
+        } else {
+          subject = this.addNamedNode(quad2.subject.id);
+        }
+        subject.addPredicate(quad2.predicate.id, quad2.object);
+      }
+      if (this.subjects[url2]) {
+        this.primary = this.subjects[url2];
+      } else {
+        this.primary = null;
+      }
+      Object.defineProperty(this, "data", {
+        get() {
+          return Object.values(this.subjects);
+        }
+      });
+    }
+    addNamedNode(uri) {
+      let absURI = new URL(uri, this.url).href;
+      if (!this.subjects[absURI]) {
+        this.subjects[absURI] = new NamedNode3(absURI, this);
+      }
+      return this.subjects[absURI];
+    }
+    addBlankNode(id) {
+      if (!this.#blankNodes[id]) {
+        this.#blankNodes[id] = new BlankNode3(this);
+      }
+      return this.#blankNodes[id];
+    }
+    addCollection(id) {
+      if (!this.#blankNodes[id]) {
+        this.#blankNodes[id] = new Collection2(this);
+      }
+      return this.#blankNodes[id];
+    }
+    write() {
+      return this.context.writer(this);
+    }
+    get(shortID) {
+      return this.subjects[this.fullURI(shortID)];
+    }
+    fullURI(shortURI, separator = null) {
+      if (!separator) {
+        separator = this.context.separator;
+      }
+      const [prefix2, path] = shortURI.split(separator);
+      if (path) {
+        return this.prefixes[prefix2] + path;
+      }
+      return shortURI;
+    }
+    shortURI(fullURI, separator = null) {
+      if (!separator) {
+        separator = this.context.separator;
+      }
+      for (let prefix2 in this.context.prefixes) {
+        if (fullURI.startsWith(this.context.prefixes[prefix2])) {
+          return prefix2 + separator + fullURI.substring(this.context.prefixes[prefix2].length);
+        }
+      }
+      if (this.url && fullURI.startsWith(this.url)) {
+        return fullURI.substring(this.url.length);
+      }
+      return fullURI;
+    }
+    /**
+     * This sets the type of a literal, usually one of the xsd types
+     */
+    setType(literal2, type) {
+      const shortType = this.shortURI(type);
+      return this.context.setType(literal2, shortType);
+    }
+    /**
+     * This returns the type of a literal, or null
+     */
+    getType(literal2) {
+      return this.context.getType(literal2);
+    }
+    setLanguage(literal2, language) {
+      if (typeof literal2 == "string") {
+        literal2 = new String(literal2);
+      } else if (typeof result == "number") {
+        literal2 = new Number(literal2);
+      }
+      if (typeof literal2 !== "object") {
+        throw new Error("cannot set language on ", literal2);
+      }
+      literal2.language = language;
+      return literal2;
+    }
+    getValue(object) {
+      let result2;
+      if (object.termType == "Literal") {
+        result2 = object.value;
+        let datatype = object.datatype?.id;
+        if (datatype) {
+          result2 = this.setType(result2, datatype);
+        }
+        let language = object.language;
+        if (language) {
+          result2 = this.setLanguage(result2, language);
+        }
+      } else if (object.termType == "BlankNode") {
+        result2 = this.addBlankNode(object.id);
+      } else {
+        result2 = this.addNamedNode(object.id);
+      }
+      return result2;
+    }
+  };
+  var BlankNode3 = class {
+    constructor(graph) {
+      Object.defineProperty(this, "graph", {
+        value: graph,
+        writable: false,
+        enumerable: false
+      });
+    }
+    addPredicate(predicate, object) {
+      if (predicate.id) {
+        predicate = predicate.id;
+      }
+      if (predicate == rdfType2) {
+        let type = this.graph.shortURI(object.id);
+        this.addType(type);
+      } else {
+        const value = this.graph.getValue(object);
+        predicate = this.graph.shortURI(predicate);
+        if (!this[predicate]) {
+          this[predicate] = value;
+        } else if (Array.isArray(this[predicate])) {
+          this[predicate].push(value);
+        } else {
+          this[predicate] = [this[predicate], value];
+        }
+      }
+    }
+    /**
+     * Adds a rdfType value, stored in this.a
+     * Subjects can have more than one type (or class), unlike literals
+     * The type value can be any URI, xsdTypes are unexpected here
+     */
+    addType(type) {
+      if (!this.a) {
+        this.a = type;
+      } else {
+        if (!Array.isArray(this.a)) {
+          this.a = [this.a];
+        }
+        this.a.push(type);
+      }
+    }
+  };
+  var NamedNode3 = class extends BlankNode3 {
+    constructor(id, graph) {
+      super(graph);
+      Object.defineProperty(this, "id", {
+        value: id,
+        writable: false,
+        enumerable: true
+      });
+    }
+  };
+  var Collection2 = class extends Array {
+    constructor(id, graph) {
+      super();
+      Object.defineProperty(this, "graph", {
+        value: graph,
+        writable: false,
+        enumerable: false
+      });
+    }
+  };
+
+  // node_modules/@muze-nl/metro-oldm/node_modules/@muze-nl/oldm/src/oldm-n3.mjs
+  var oldm_n3_exports2 = {};
+  __export(oldm_n3_exports2, {
+    n3Parser: () => n3Parser2,
+    n3Writer: () => n3Writer2
+  });
+  var n3Parser2 = (input, uri, type) => {
+    const parser = new src_default.Parser({
+      baseIRI: uri,
+      blankNodePrefix: "",
+      format: type
+    });
+    let prefixes4 = /* @__PURE__ */ Object.create(null);
+    const quads = parser.parse(input, null, (prefix2, url2) => {
+      prefixes4[prefix2] = url2.id;
+    });
+    return { quads, prefixes: prefixes4 };
+  };
+  var n3Writer2 = (source) => {
+    return new Promise((resolve, reject) => {
+      const writer = new src_default.Writer({
+        format: source.type,
+        prefixes: { ...source.prefixes }
+      });
+      const xsd4 = source.prefixes.xsd;
+      const { quad: quad2, namedNode: namedNode2, literal: literal2, blankNode: blankNode2 } = src_default.DataFactory;
+      const writeClassNames = (id, subject) => {
+        let classNames = subject.a;
+        if (!Array.isArray(classNames)) {
+          classNames = [classNames];
+        }
+        if (classNames?.length) {
+          for (let name of classNames) {
+            name = source.fullURI(name);
+            writer.addQuad(quad2(
+              namedNode2(id),
+              namedNode2(rdfType2),
+              namedNode2(name)
+            ));
+          }
+        }
+      };
+      const writeProperties = (id, subject) => {
+        if (!subject) {
+          return;
+        }
+        let preds = getPredicates(subject);
+        for (let pred of preds) {
+          if (pred.predicate.id == "id" || pred.predicate.id == "a") {
+            continue;
+          }
+          if (!Array.isArray(pred.object)) {
+            pred.object = [pred.object];
+          }
+          for (let o of pred.object) {
+            writer.addQuad(quad2(
+              namedNode2(id),
+              pred.predicate,
+              o
+            ));
+          }
+        }
+      };
+      const getPredicates = (object) => {
+        let preds = [];
+        Object.entries(object).forEach((entry) => {
+          const predicate = entry[0];
+          let object2 = entry[1];
+          const fullPred = source.fullURI(predicate);
+          let pred = {
+            predicate: namedNode2(fullPred)
+          };
+          if (object2 instanceof Collection2) {
+            pred.object = getCollection(object2);
+          } else if (Array.isArray(object2)) {
+            pred.object = getArray(object2);
+          } else if (object2 instanceof NamedNode3) {
+            pred.object = namedNode2(object2.id);
+          } else if (object2 instanceof BlankNode3) {
+            pred.object = getBlankNode(object2);
+          } else if (isLiteral3(object2)) {
+            pred.object = getLiteral(object2);
+          } else {
+            console.log("oldm-ns: encountered unknown object", object2, predicate);
+          }
+          preds.push(pred);
+        });
+        return preds;
+      };
+      const getLiteral = (object) => {
+        let type = source.getType(object) || void 0;
+        if (type) {
+          if (type == xsd4 + source.context.separator + "string" || type == xsd4 + source.context.separator + "number") {
+            type = void 0;
+          } else {
+            type = source.fullURI(type);
+          }
+          type = namedNode2(type);
+        } else {
+          let language = object?.language;
+          if (language) {
+            type = language;
+          }
+        }
+        if (object instanceof String) {
+          object = "" + object;
+        } else if (object instanceof Number) {
+          object = +object;
+        }
+        return literal2(object, type);
+      };
+      const isLiteral3 = (value) => {
+        return value instanceof String || value instanceof Number || typeof value == "boolean" || typeof value == "string" || typeof value == "number";
+      };
+      const getCollection = (object) => {
+        let list = [];
+        for (let value of object) {
+          if (isLiteral3(value)) {
+            list.push(getLiteral(value));
+          } else if (value.id) {
+            list.push(namedNode2(value.id));
+          } else {
+            list.push(getBlankNode(value));
+          }
+        }
+        return writer.list(list);
+      };
+      const getBlankNode = (object) => {
+        return writer.blank(getPredicates(object));
+      };
+      const getArray = (id, object) => {
+        let list = [];
+        for (const o of object) {
+          if (isLiteral3(o)) {
+            list.push(getLiteral(o));
+          } else if (o instanceof NamedNode3) {
+            list.push(namedNode2(o.id));
+          } else if (o instanceof BlankNode3) {
+            list.push(getBlankNode(o));
+          } else if (o instanceof Collection2) {
+            list.push(getCollection(o));
+          }
+        }
+        return list;
+      };
+      Object.entries(source.subjects).forEach(([id, subject]) => {
+        id = source.shortURI(id, ":");
+        writeClassNames(id, subject);
+        writeProperties(id, subject);
+      });
+      writer.end((error3, result2) => {
+        if (result2) {
+          resolve(result2);
+        } else {
+          reject(error3);
+        }
+      });
+    });
+  };
+
+  // node_modules/@muze-nl/metro-oldm/node_modules/@muze-nl/oldm/src/index.mjs
+  var oldm5 = {
+    context: oldm4,
+    ...oldm_exports2,
+    ...oldm_n3_exports2
+  };
+  globalThis.oldm = oldm5;
+  var src_default2 = oldm5;
+
   // node_modules/@muze-nl/metro-oldm/src/oldmmw.mjs
   function oldmmw2(options) {
     options = Object.assign({
@@ -15478,30 +16466,7 @@
   };
 
   // src/SolidClient.js
-  async function solidClient(webid, solidOptions) {
-    const defaults = {
-      prefixes: {
-        "ldp": "http://www.w3.org/ns/ldp#",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "dct": "http://purl.org/dc/terms/",
-        "stat": "http://www.w3.org/ns/posix/stat#",
-        "turtle": "http://www.w3.org/ns/iana/media-types/text/turtle#",
-        "schema": "https://schema.org/",
-        "solid": "http://www.w3.org/ns/solid/terms#",
-        "acl": "http://www.w3.org/ns/auth/acl#",
-        "space": "http://www.w3.org/ns/pim/space#",
-        "vcard": "http://www.w3.org/2006/vcard/ns#",
-        "foaf": "http://xmlns.com/foaf/0.1/"
-      },
-      parser: oldm.n3Parser,
-      writer: oldm.n3Writer
-    };
-    const options = Object.assign({}, defaults, solidOptions);
-    for (const prefix2 in defaults.prefixes) {
-      if (!options.prefixes[prefix2]) {
-        options.prefixes[prefix2] = defaults.prefixes[prefix2];
-      }
-    }
+  async function solidClient(webid, options) {
     const response2 = await metro.client(oldmmw(options), metro.mw.getdata()).get(webid);
     const profile = response2?.primary;
     if (!profile || !profile.solid$oidcIssuer) {
